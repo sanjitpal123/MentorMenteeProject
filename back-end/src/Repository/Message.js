@@ -44,3 +44,15 @@ export const GetAllMessageOfAConvoRepo = async (id) => {
     throw error;
   }
 };
+
+export const seenMessageRepo = async (convoId, userId) => {
+  try {
+    const res = await message.updateMany(
+      { conversation: convoId, sender: { $ne: userId } },
+      { $set: { isRead: true } }
+    );
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};

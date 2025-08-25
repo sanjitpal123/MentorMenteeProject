@@ -23,8 +23,6 @@ import LowToHighFiltering from "../services/Lowtohigh";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { TextPlugin } from "gsap/TextPlugin";
-import WishList from "../../../../src/Model/WishListModel";
-import Wishlist from "./WishList";
 import WishListSer from "../services/AddToWishList";
 import { Link, useNavigate } from "react-router-dom";
 import { CreateConvo } from "../services/Convo";

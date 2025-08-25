@@ -163,7 +163,7 @@ import {
 } from "lucide-react";
 import {
   GetAllMessageSer,
-  SeenMessage,
+  SeenMessageMessage,
   sendMessage,
 } from "../services/Message";
 
@@ -837,7 +837,7 @@ export const MessagesFromMentee = () => {
   // ✅ Update seen status API
   async function UpdateMessage() {
     try {
-      const res = await SeenMessage(Convoid, user?.token);
+      const res = await SeenMessageMessage(Convoid, user?.token);
       console.log("Seen status updated:", res);
     } catch (error) {
       console.log("Error updating message status:", error);
@@ -930,7 +930,7 @@ export const MessagesFromMentee = () => {
 
   // ✅ Listen for "seenMessage" → Update DB & UI
   useEffect(() => {
-    const handleSeenMessage = async ({ convoId }) => {
+    const handleSeenMessage = async (convoId) => {
       console.log(`Messages in convo ${convoId} are seen ✅`);
 
       if (Convoid === convoId) {

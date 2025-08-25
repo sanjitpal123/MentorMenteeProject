@@ -53,7 +53,7 @@ export const SocketServer = (socket, io) => {
   });
 
   socket.on("seen", ({ convoId, receiverId }) => {
-    console.log("seen message by ");
+    console.log("seen message by ", convoId);
     io.to(receiverId).emit("seenMessage", convoId);
   });
 

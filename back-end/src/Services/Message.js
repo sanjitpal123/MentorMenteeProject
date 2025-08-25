@@ -1,7 +1,9 @@
+import { SeenMessage } from "../Controller/Message.js";
 import {
   DeletedMessageRepo,
   EditMessage,
   GetAllMessageOfAConvoRepo,
+  seenMessageRepo,
   SendMessageRepo,
 } from "../Repository/Message.js";
 
@@ -35,6 +37,15 @@ export const GetAllMessageOfAConvo = async (convoid) => {
   try {
     const messages = await GetAllMessageOfAConvoRepo(convoid);
     return messages;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const SeenMessageService = async (convoid, userId) => {
+  try {
+    const res = await seenMessageRepo(convoid, userId);
+    return res;
   } catch (error) {
     throw error;
   }

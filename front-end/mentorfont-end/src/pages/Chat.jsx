@@ -7,7 +7,7 @@ import { FetchConvoById } from "../services/Convo";
 import { useState } from "react";
 import {
   GetAllMessageSer,
-  SeenMessage,
+  SeenMessageMessage,
   sendMessage,
 } from "../services/Message";
 
@@ -47,7 +47,8 @@ function ChatBox() {
   // ✅ Update message as seen
   async function UpdateMessage() {
     try {
-      await SeenMessage(convoid, user.token);
+      const updated = await SeenMessageMessage(convoid, user.token);
+      console.log("message is udpated", updated);
     } catch (error) {
       console.error("Error updating seen:", error);
     }
@@ -131,6 +132,7 @@ function ChatBox() {
   useEffect(() => {
     async function handleSeen({ convoId }) {
       if (convoid === convoId) {
+        console.log("seen message");
         await UpdateMessage();
         await GetAllMessages();
       }

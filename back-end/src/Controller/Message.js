@@ -4,6 +4,7 @@ import {
   DeleteMessageService,
   EditMessageService,
   GetAllMessageOfAConvo,
+  SeenMessageService,
   SendMessageService,
 } from "../Services/Message.js";
 
@@ -11,7 +12,6 @@ export const SendMessage = async (req, res) => {
   try {
     const { conversation, text, isRead } = req.body;
     const sender = req.user.userId;
-    console.log("conversation", conversation, "text", text, "isread", isRead);
     if (!conversation || !text) {
       return res.status(404).json({
         message: "Fill all the fields",
@@ -25,7 +25,6 @@ export const SendMessage = async (req, res) => {
       sender,
     };
     const send = await SendMessageService(data);
-    console.log("send", send);
     if (!send) {
       return res.status(401).json({
         message: "Can not send message",
@@ -33,9 +32,7 @@ export const SendMessage = async (req, res) => {
       });
     }
     const convoId = conversation;
-    console.log("convoId", convoId);
     const getConvById = await GetConvoByIdService(convoId);
-    console.log("convo is here", getConvById);
     return res.status(201).json({
       success: true,
       message: "Successfully sent message",
@@ -54,7 +51,6 @@ export const SendMessage = async (req, res) => {
 export const GetUserMessage = async (req, res) => {
   try {
     const { id } = req.body;
-    console.log("id to get message", id);
 
     if (!id) {
       return res.status(401).json({
@@ -62,7 +58,6 @@ export const GetUserMessage = async (req, res) => {
       });
     }
     const messages = await GetAllMessageOfAConvo(id);
-    console.log("essges", messages);
     if (!messages) {
       return res.status(404).json({
         message: "Could not get any message with this convo ",
@@ -70,7 +65,6 @@ export const GetUserMessage = async (req, res) => {
     }
     return res.status(201).json(messages);
   } catch (error) {
-    console.log("errorsdfs", error);
     return res.status(501).json({
       message: "Internal server error",
       success: false,
@@ -126,6 +120,44 @@ export const EditMessage = async (req, res) => {
     return res.status(501).json({
       message: "Internal server error",
       success: false,
+    });
+  }
+};
+export const SeenMessage = async (req, res) => {
+  try {
+    const { convoId } = req.body;
+    const userId = req.user.userId;
+    const isExist = await GetConvoByIdService(convoId);
+    if (!isExist) {
+      return res.status(404).json({
+        message: "Can not find any message ",
+        success: false,
+      });
+    }
+    const seenMessage = await SeenMessageService(convoId, userId);
+    const allMessage = await message.find({ conversation: convoId });
+    if (!allMessage) {
+      return res.status(401).json({
+        message: "Can not get message",
+        success: false,
+      });
+    }
+    if (!seenMessage) {
+      return res.status(401).json({
+        message: "Can not seen message",
+        success: false,
+      });
+    }
+    return res.status(201).json({
+      message: "Updated message successfully",
+      seenMessage,
+      allMessage,
+    });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(501).json({
+      error,
+      message: "Internal server error",
     });
   }
 };

@@ -29,7 +29,7 @@ export const GetAllMessageSer = async (id, token) => {
     throw error;
   }
 };
-export const SeenMessage = async (convoId, token) => {
+export const SeenMessageMessage = async (convoId, token) => {
   try {
     const res = await axiosInstance.post(
       "/message/mark_seen",
