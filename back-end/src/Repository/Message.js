@@ -1,5 +1,5 @@
 import message from "../Model/Message.js";
-
+import mongoose from "mongoose";
 export const SendMessageRepo = async (data) => {
   try {
     const created = await message.create(data);
@@ -48,7 +48,10 @@ export const GetAllMessageOfAConvoRepo = async (id) => {
 export const seenMessageRepo = async (convoId, userId) => {
   try {
     const res = await message.updateMany(
-      { conversation: convoId, sender: { $ne: userId } },
+      {
+        conversation: new mongoose.Types.ObjectId(convoId),
+        sender: { $ne: new mongoose.Types.ObjectId(userId) },
+      },
       { $set: { isRead: true } }
     );
     return res;

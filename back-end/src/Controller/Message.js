@@ -127,6 +127,7 @@ export const SeenMessage = async (req, res) => {
   try {
     const { convoId } = req.body;
     const userId = req.user.userId;
+    console.log("user in before seen", userId);
     const isExist = await GetConvoByIdService(convoId);
     if (!isExist) {
       return res.status(404).json({
