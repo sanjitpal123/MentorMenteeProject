@@ -899,6 +899,7 @@ export const MessagesFromMentee = () => {
         convoId: Convoid,
         receiverId: MenteeToPass._id,
       });
+      UpdateMessage();
     }
   }, [Convoid, MenteeToPass]);
 
@@ -909,7 +910,7 @@ export const MessagesFromMentee = () => {
 
   // ✅ Listen for incoming messages
   useEffect(() => {
-    const handler = (sms) => {
+    const handler = async (sms) => {
       setAllMessage((prev) => [...prev, sms]);
 
       // Mark messages as seen if open chat matches
@@ -919,6 +920,7 @@ export const MessagesFromMentee = () => {
           receiverId: MenteeToPass._id,
         });
       }
+      await UpdateMessage();
     };
 
     socket.on("receiveMessage", handler);
@@ -936,7 +938,6 @@ export const MessagesFromMentee = () => {
       if (Convoid === convoId) {
         try {
           await UpdateMessage();
-          await GetMessages();
         } catch (error) {
           console.error("Error updating seen status:", error);
         }

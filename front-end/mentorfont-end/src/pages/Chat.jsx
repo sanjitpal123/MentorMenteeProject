@@ -66,11 +66,11 @@ function ChatBox() {
       const res = await sendMessage(data, user.token);
 
       // Update UI immediately
-      setChatMessages((prev) => [...prev, res.data.send]);
 
       // Emit event to server
       socket.emit("sendMessage", res.data);
       socket.emit("stop typing", Receiver._id);
+      GetAllMessages();
 
       setMessage("");
     } catch (error) {
@@ -101,6 +101,7 @@ function ChatBox() {
       GetAllMessages();
       if (Receiver._id) {
         socket.emit("seen", { convoId: convoid, receiverId: Receiver._id });
+        UpdateMessage();
       }
     }
   }, [convoid]);
@@ -114,12 +115,13 @@ function ChatBox() {
 
   // ✅ Handle receiving new messages
   useEffect(() => {
-    function handleReceiveMessage(message) {
-      setChatMessages((prev) => [...prev, message]);
+    const handleReceiveMessage = async (message) => {
+      GetAllMessages();
       if (convoid && Receiver._id) {
         socket.emit("seen", { convoId: convoid, receiverId: Receiver._id });
+        await UpdateMessage();
       }
-    }
+    };
 
     socket.on("receiveMessage", handleReceiveMessage);
 
@@ -133,7 +135,6 @@ function ChatBox() {
     async function handleSeen({ convoId }) {
       if (convoid === convoId) {
         console.log("seen message");
-        await UpdateMessage();
         await GetAllMessages();
       }
     }
@@ -161,6 +162,7 @@ function ChatBox() {
       socket.off("stop typing", handleStopTyping);
     };
   }, [Receiver]);
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 p-4">
       <div className="w-[80%] h-[120vh] bg-black rounded-2xl shadow-2xl overflow-hidden border border-red-900/30 flex flex-col">
