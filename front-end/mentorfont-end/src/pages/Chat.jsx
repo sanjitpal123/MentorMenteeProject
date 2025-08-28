@@ -18,7 +18,7 @@ function ChatBox() {
   const [Receiver, setReceiver] = useState([]);
   const [Message, setMessage] = useState("");
   const [ChatMessages, setChatMessages] = useState([]);
-  const [convoid, setConvoId] = useState(null);
+  const [Convoid, setConvoid] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
   const { id } = useParams();
 
@@ -28,7 +28,7 @@ function ChatBox() {
     try {
       const res = await FetchConvoById(id, user.token);
       setReceiver(res.convo.participants[0]);
-      setConvoId(res.convo._id);
+      setConvoid(res.convo._id);
     } catch (error) {
       console.error("Error fetching convo:", error);
     }
@@ -37,7 +37,7 @@ function ChatBox() {
   // ✅ Fetch all messages
   async function GetAllMessages() {
     try {
-      const res = await GetAllMessageSer(convoid, user.token);
+      const res = await GetAllMessageSer(Convoid, user.token);
       setChatMessages(res);
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -47,7 +47,7 @@ function ChatBox() {
   // ✅ Update message as seen
   async function UpdateMessage() {
     try {
-      const updated = await SeenMessageMessage(convoid, user.token);
+      const updated = await SeenMessageMessage(Convoid, user.token);
       console.log("message is udpated", updated);
     } catch (error) {
       console.error("Error updating seen:", error);
@@ -58,7 +58,7 @@ function ChatBox() {
   async function handleSendMessage() {
     try {
       const data = {
-        conversation: convoid,
+        conversation: Convoid,
         text: Message,
         isRead: false,
       };
@@ -97,14 +97,14 @@ function ChatBox() {
   }, [id]);
 
   useEffect(() => {
-    if (convoid) {
+    if (Convoid) {
       GetAllMessages();
       if (Receiver._id) {
-        socket.emit("seen", { convoId: convoid, receiverId: Receiver._id });
+        socket.emit("seen", { convoId: Convoid, receiverId: Receiver._id });
         UpdateMessage();
       }
     }
-  }, [convoid]);
+  }, [Convoid, Receiver._id]);
 
   // ✅ Join socket room
   useEffect(() => {
@@ -116,10 +116,13 @@ function ChatBox() {
   // ✅ Handle receiving new messages
   useEffect(() => {
     const handleReceiveMessage = async (message) => {
-      GetAllMessages();
-      if (convoid && Receiver._id) {
-        socket.emit("seen", { convoId: convoid, receiverId: Receiver._id });
+      if (Convoid) {
+        socket.emit("seen", {
+          convoId: Convoid,
+          receiverId: Receiver._id,
+        });
         await UpdateMessage();
+        await GetAllMessages();
       }
     };
 
@@ -128,13 +131,17 @@ function ChatBox() {
     return () => {
       socket.off("receiveMessage", handleReceiveMessage);
     };
-  }, [convoid, Receiver]);
+  }, [Convoid, Receiver]);
 
   // ✅ Handle "seen" messages
   useEffect(() => {
     async function handleSeen({ convoId }) {
-      if (convoid === convoId) {
+      await GetAllMessages();
+
+      if (Convoid == convoId) {
+        console.log("seeng message sdk");
         console.log("seen message");
+        await UpdateMessage();
         await GetAllMessages();
       }
     }
@@ -143,7 +150,7 @@ function ChatBox() {
     return () => {
       socket.off("seenMessage", handleSeen);
     };
-  }, [convoid]);
+  }, [Convoid, user.token]);
 
   // ✅ Typing indicator listener
   useEffect(() => {

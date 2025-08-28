@@ -805,6 +805,7 @@ export const MessagesFromMentee = () => {
   const [Convoid, setConvoId] = useState(null);
   const [AllMessage, setAllMessage] = useState([]);
   const [isTyping, setisTyping] = useState(false);
+  const [updatedMessage, setUpdatedMessage] = useState([]);
 
   // ✅ Fetch all conversations of mentor
   async function GetMentorConversation() {
@@ -838,6 +839,7 @@ export const MessagesFromMentee = () => {
   async function UpdateMessage() {
     try {
       const res = await SeenMessageMessage(Convoid, user?.token);
+      setUpdatedMessage(res.allMessage);
       console.log("Seen status updated:", res);
     } catch (error) {
       console.log("Error updating message status:", error);
@@ -915,12 +917,14 @@ export const MessagesFromMentee = () => {
 
       // Mark messages as seen if open chat matches
       if (Convoid && MenteeToPass._id) {
+        console.log("sending message after receving");
         socket.emit("seen", {
           convoId: Convoid,
           receiverId: MenteeToPass._id,
         });
       }
       await UpdateMessage();
+      await GetMessages();
     };
 
     socket.on("receiveMessage", handler);
@@ -938,6 +942,7 @@ export const MessagesFromMentee = () => {
       if (Convoid === convoId) {
         try {
           await UpdateMessage();
+          await GetMessages();
         } catch (error) {
           console.error("Error updating seen status:", error);
         }
