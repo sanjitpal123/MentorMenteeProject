@@ -57,6 +57,10 @@ export const SocketServer = (socket, io) => {
     io.to(receiverId).emit("seenMessage", convoId);
   });
 
+  socket.on("EditMessage", ({ receiverId }) => {
+    console.log("edit message");
+    io.to(receiverId).emit("getEditMessage");
+  });
   // for offline user
   socket.on("disconnect", () => {
     onlinusers = onlinusers.filter((u) => u.socketId !== socket.id);

@@ -45,3 +45,20 @@ export const SeenMessageMessage = async (convoId, token) => {
     throw error;
   }
 };
+
+export const EditMessage = async (id, text, token) => {
+  try {
+    const res = await axiosInstance.put(
+      `/message/editmessage/${id}`,
+      { text: text },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

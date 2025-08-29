@@ -33,6 +33,8 @@ import {
   Heart,
   Eye,
   Bookmark,
+  MoreHorizontal,
+  HourglassIcon,
 } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { GlobalContext } from "../ContextApiStore/ContextStore";
@@ -162,6 +164,7 @@ import {
   X,
 } from "lucide-react";
 import {
+  EditMessage,
   GetAllMessageSer,
   SeenMessageMessage,
   sendMessage,
@@ -806,6 +809,9 @@ export const MessagesFromMentee = () => {
   const [AllMessage, setAllMessage] = useState([]);
   const [isTyping, setisTyping] = useState(false);
   const [updatedMessage, setUpdatedMessage] = useState([]);
+  const [OpenId, setOpenId] = useState(null);
+  const [Open, setisOpen] = useState(false);
+  const [EditClick, setEditClick] = useState(false);
 
   // ✅ Fetch all conversations of mentor
   async function GetMentorConversation() {
@@ -971,6 +977,33 @@ export const MessagesFromMentee = () => {
       socket.off("stop typing");
     };
   }, [MenteeToPass]);
+
+  // open menu to delete and edit
+
+  function handleOpen(id) {
+    console.log("opening", id);
+    setOpenId(id);
+    setisOpen((prev) => !prev);
+    setMessage("");
+  }
+  // handle Edit message
+
+  function handleEdit(id, value) {
+    setMessage(value);
+    setisOpen(false);
+    setEditClick(true);
+  }
+
+  async function handleSubmitOfEdit() {
+    try {
+      const res = await EditMessage(OpenId, Message, user.token);
+      console.log("edit message response", res);
+      setMessage("");
+      GetMessages();
+    } catch (error) {
+      console.log("error to edit message", error);
+    }
+  }
   return (
     <div className="h-full flex">
       {/* Chat List */}
@@ -1067,19 +1100,49 @@ export const MessagesFromMentee = () => {
                   key={i}
                   className={`flex ${
                     isSender ? "justify-end" : "justify-start"
-                  }`}
+                  } mb-4`}
                 >
                   <div
-                    className={`relative group px-4 py-3 rounded-2xl shadow-md max-w-[75%] break-words transition-transform duration-300 hover:scale-[1.02] ${
-                      isSender
-                        ? "bg-gradient-to-r from-red-600 to-red-700 text-white"
-                        : "bg-gradient-to-r from-gray-900 to-gray-800 text-white border border-red-600/20"
-                    }`}
+                    className={`relative group px-4 py-3 rounded-2xl shadow-lg max-w-[70%] break-words 
+        transition-all duration-300 transform hover:scale-[1.03] hover:shadow-2xl ${
+          isSender
+            ? "bg-gradient-to-r from-red-600 to-red-700 text-white"
+            : "bg-gradient-to-r from-gray-900 to-gray-800 text-white border border-red-600/30"
+        }`}
                   >
-                    {/* Message Text */}
-                    <p className="text-base leading-relaxed">{msg.text}</p>
+                    {/* Dropdown (only for sender) */}
+                    {Open && OpenId === msg._id && (
+                      <div className="absolute right-10 top-[-4rem] w-52 bg-white/95 border border-gray-200 rounded-2xl shadow-2xl z-30 animate-fade-in">
+                        <button
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-2xl transition-colors"
+                          onClick={() => handleEdit(msg._id, msg.text)}
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                          🗑️ Delete for Everyone
+                        </button>
+                        <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-2xl transition-colors">
+                          ❌ Delete for Me
+                        </button>
+                      </div>
+                    )}
 
-                    {/* Time + Seen Ticks */}
+                    {/* Message + Options */}
+                    <div className="text-base leading-relaxed flex items-start gap-3">
+                      <p className="whitespace-pre-wrap">{msg.text}</p>
+                      {isSender && (
+                        <div
+                          className="cursor-pointer text-white/70 hover:text-white transition-colors z-50"
+                          role="button"
+                          onClick={() => handleOpen(msg._id)}
+                        >
+                          ⋮
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Time + Seen */}
                     <div className="flex items-center gap-2 mt-2 justify-end">
                       <span
                         className={`text-xs ${
@@ -1093,7 +1156,6 @@ export const MessagesFromMentee = () => {
                           })}
                       </span>
 
-                      {/* Seen / Sent Indicator */}
                       {isSender && (
                         <span
                           className={`text-xs font-semibold ${
@@ -1105,8 +1167,8 @@ export const MessagesFromMentee = () => {
                       )}
                     </div>
 
-                    {/* Bubble Hover Effect */}
-                    <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-10 bg-white transition-all duration-300"></div>
+                    {/* Hover Glow Effect */}
+                    <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-20 bg-white transition duration-300 pointer-events-none"></div>
                   </div>
                 </div>
               );
@@ -1124,21 +1186,41 @@ export const MessagesFromMentee = () => {
         </div>
 
         <div className="p-6 border-t border-red-500/30">
-          <div className="flex gap-3">
-            <input
-              type="text"
-              onChange={handleSetMessage}
-              value={Message}
-              placeholder="Type your message..."
-              className="flex-1 px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-red-500/50 transition-colors"
-            />
-            <button
-              className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-xl font-medium transition-all duration-300 hover:scale-105"
-              onClick={handleSubmit}
-            >
-              Send
-            </button>
-          </div>
+          {!EditClick && (
+            <div className="flex gap-3">
+              <input
+                type="text"
+                onChange={handleSetMessage}
+                value={Message}
+                placeholder="Type your message..."
+                className="flex-1 px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-red-500/50 transition-colors"
+              />
+              <button
+                className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-xl font-medium transition-all duration-300 hover:scale-105"
+                onClick={handleSubmit}
+              >
+                Send
+              </button>
+            </div>
+          )}
+
+          {EditClick && (
+            <div className="flex gap-3">
+              <input
+                type="text"
+                onChange={handleSetMessage}
+                value={Message}
+                placeholder="Type your message..."
+                className="flex-1 px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-red-500/50 transition-colors"
+              />
+              <button
+                className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-xl font-medium transition-all duration-300 hover:scale-105"
+                onClick={handleSubmitOfEdit}
+              >
+                Send
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

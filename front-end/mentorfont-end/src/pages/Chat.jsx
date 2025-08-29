@@ -126,9 +126,15 @@ function ChatBox() {
       }
     };
 
+    const handleReceiveEditedMessage = async () => {
+      console.log("ekldfls");
+      await GetAllMessages();
+    };
+    socket.on("getEditMessage", handleReceiveEditedMessage);
     socket.on("receiveMessage", handleReceiveMessage);
 
     return () => {
+      socket.off("getEditMessage", handleReceiveEditedMessage);
       socket.off("receiveMessage", handleReceiveMessage);
     };
   }, [Convoid, Receiver]);
