@@ -59,3 +59,40 @@ export const seenMessageRepo = async (convoId, userId) => {
     throw error;
   }
 };
+
+export const getMessageByIdRepo = async (id) => {
+  try {
+    const res = await message.findById(id);
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const DeleteMessageForEveryoneRepo = async (id) => {
+  try {
+    const res = await message.findByIdAndUpdate(
+      id,
+      {
+        isDeletedForEveryone: true,
+        text: "",
+      },
+      { new: true }
+    );
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+export const DeletedMessageByidRepo = async (id, user) => {
+  try {
+    const res = await message.findByIdAndUpdate(
+      id,
+      { deletedBy: user },
+      { new: true }
+    );
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};

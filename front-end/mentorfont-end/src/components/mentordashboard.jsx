@@ -164,11 +164,14 @@ import {
   X,
 } from "lucide-react";
 import {
+  DeleteForMeSer,
+  DeleteMessageForEveryoneService,
   EditMessage,
   GetAllMessageSer,
   SeenMessageMessage,
   sendMessage,
 } from "../services/Message";
+import { deleteModel } from "mongoose";
 
 // Exact colors (no Tailwind palette approximations)
 const COLORS = {
@@ -799,6 +802,7 @@ export const RecentActivities = () => {
 // };
 
 export const MessagesFromMentee = () => {
+  const scroll = useRef();
   const { User } = useContext(GlobalContext);
   const user = JSON.parse(localStorage.getItem("user"));
   const [Mentees, setMentees] = useState([]);
@@ -812,6 +816,7 @@ export const MessagesFromMentee = () => {
   const [OpenId, setOpenId] = useState(null);
   const [Open, setisOpen] = useState(false);
   const [EditClick, setEditClick] = useState(false);
+  const [UpdatedText, setUpdatedText] = useState("");
 
   // ✅ Fetch all conversations of mentor
   async function GetMentorConversation() {
@@ -896,6 +901,11 @@ export const MessagesFromMentee = () => {
     timeout = setTimeout(() => {
       socket.emit("stop typing", MenteeToPass._id);
     }, 3000);
+  }
+
+  // handle Edit message change
+  function handleSetMessage1(e) {
+    setUpdatedText(e.target.value);
   }
 
   // ✅ On conversation change → Fetch messages & emit "seen"
@@ -989,21 +999,48 @@ export const MessagesFromMentee = () => {
   // handle Edit message
 
   function handleEdit(id, value) {
-    setMessage(value);
+    setUpdatedText(value);
     setisOpen(false);
     setEditClick(true);
   }
 
   async function handleSubmitOfEdit() {
     try {
-      const res = await EditMessage(OpenId, Message, user.token);
+      const res = await EditMessage(OpenId, UpdatedText, user.token);
       console.log("edit message response", res);
-      setMessage("");
+      setUpdatedText("");
       GetMessages();
+      socket.emit("EditMessage", { receiverId: MenteeToPass._id });
     } catch (error) {
       console.log("error to edit message", error);
     }
   }
+  async function DeleteMessageForEveryone() {
+    try {
+      const res = await DeleteMessageForEveryoneService(OpenId);
+      setisOpen(false);
+      GetMessages();
+      socket.emit("EditMessage", { receiverId: MenteeToPass._id });
+      console.log("deleted Message", res);
+    } catch (error) {
+      console.log("error to delete", error);
+    }
+  }
+
+  async function DeleteForMe() {
+    try {
+      const res = await DeleteForMeSer(OpenId, user.token);
+      console.log("responsive to delete for me ", res);
+    } catch (error) {
+      console.log("error to delete for me", error);
+    }
+  }
+  // scroll to last message
+  useEffect(() => {
+    if (scroll.current) {
+      scroll.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [AllMessage]);
   return (
     <div className="h-full flex">
       {/* Chat List */}
@@ -1023,7 +1060,7 @@ export const MessagesFromMentee = () => {
           </div>
         </div>
 
-        <div className="overflow-y-auto">
+        <div className="overflow-y-auto max-h-[100vh]">
           {OnlyMentees?.map((mentee, i) => (
             <div
               key={i}
@@ -1104,11 +1141,11 @@ export const MessagesFromMentee = () => {
                 >
                   <div
                     className={`relative group px-4 py-3 rounded-2xl shadow-lg max-w-[70%] break-words 
-        transition-all duration-300 transform hover:scale-[1.03] hover:shadow-2xl ${
-          isSender
-            ? "bg-gradient-to-r from-red-600 to-red-700 text-white"
-            : "bg-gradient-to-r from-gray-900 to-gray-800 text-white border border-red-600/30"
-        }`}
+                    transition-all duration-300 transform hover:scale-[1.03] hover:shadow-2xl ${
+                      isSender
+                        ? "bg-gradient-to-r from-red-600 to-red-700 text-white"
+                        : "bg-gradient-to-r from-gray-900 to-gray-800 text-white border border-red-600/30"
+                    }`}
                   >
                     {/* Dropdown (only for sender) */}
                     {Open && OpenId === msg._id && (
@@ -1117,30 +1154,45 @@ export const MessagesFromMentee = () => {
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-2xl transition-colors"
                           onClick={() => handleEdit(msg._id, msg.text)}
                         >
-                          ✏️ Edit
+                          Edit
                         </button>
-                        <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
-                          🗑️ Delete for Everyone
+                        <button
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                          onClick={DeleteMessageForEveryone}
+                        >
+                          Delete for Everyone
                         </button>
-                        <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-2xl transition-colors">
-                          ❌ Delete for Me
+                        <button
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-2xl transition-colors"
+                          onClick={DeleteForMe}
+                        >
+                          Delete for Me
                         </button>
                       </div>
                     )}
 
                     {/* Message + Options */}
-                    <div className="text-base leading-relaxed flex items-start gap-3">
-                      <p className="whitespace-pre-wrap">{msg.text}</p>
-                      {isSender && (
-                        <div
-                          className="cursor-pointer text-white/70 hover:text-white transition-colors z-50"
-                          role="button"
-                          onClick={() => handleOpen(msg._id)}
-                        >
-                          ⋮
-                        </div>
-                      )}
-                    </div>
+                    {msg.text !== "" && (
+                      <div className="text-base leading-relaxed flex items-start gap-3">
+                        <p className="whitespace-pre-wrap">{msg.text}</p>
+                        {isSender && (
+                          <div
+                            className="cursor-pointer text-white/70 hover:text-white transition-colors z-50"
+                            role="button"
+                            onClick={() => handleOpen(msg._id)}
+                          >
+                            ⋮
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {msg.text == "" && (
+                      <div>
+                        <i className="text-gray-500 italic">
+                          This message was deleted
+                        </i>
+                      </div>
+                    )}
 
                     {/* Time + Seen */}
                     <div className="flex items-center gap-2 mt-2 justify-end">
@@ -1156,7 +1208,7 @@ export const MessagesFromMentee = () => {
                           })}
                       </span>
 
-                      {isSender && (
+                      {isSender && msg.text !== "" ? (
                         <span
                           className={`text-xs font-semibold ${
                             msg.isRead ? "text-blue-400" : "text-gray-400"
@@ -1164,7 +1216,7 @@ export const MessagesFromMentee = () => {
                         >
                           {msg.isRead ? "✓✓" : "✓"}
                         </span>
-                      )}
+                      ) : null}
                     </div>
 
                     {/* Hover Glow Effect */}
@@ -1208,8 +1260,8 @@ export const MessagesFromMentee = () => {
             <div className="flex gap-3">
               <input
                 type="text"
-                onChange={handleSetMessage}
-                value={Message}
+                onChange={handleSetMessage1}
+                value={UpdatedText}
                 placeholder="Type your message..."
                 className="flex-1 px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-red-500/50 transition-colors"
               />

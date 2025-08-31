@@ -126,18 +126,25 @@ function ChatBox() {
       }
     };
 
+    socket.on("receiveMessage", handleReceiveMessage);
+
+    return () => {
+      socket.off("receiveMessage", handleReceiveMessage);
+    };
+  }, [Convoid, Receiver]);
+
+  /// handle UpdatedMessage Listen
+
+  useEffect(() => {
     const handleReceiveEditedMessage = async () => {
       console.log("ekldfls");
       await GetAllMessages();
     };
     socket.on("getEditMessage", handleReceiveEditedMessage);
-    socket.on("receiveMessage", handleReceiveMessage);
-
     return () => {
       socket.off("getEditMessage", handleReceiveEditedMessage);
-      socket.off("receiveMessage", handleReceiveMessage);
     };
-  }, [Convoid, Receiver]);
+  }, [socket, Convoid]);
 
   // ✅ Handle "seen" messages
   useEffect(() => {

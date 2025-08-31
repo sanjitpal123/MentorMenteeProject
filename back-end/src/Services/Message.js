@@ -1,8 +1,11 @@
 import { SeenMessage } from "../Controller/Message.js";
 import {
+  DeletedMessageByidRepo,
   DeletedMessageRepo,
+  DeleteMessageForEveryoneRepo,
   EditMessage,
   GetAllMessageOfAConvoRepo,
+  getMessageByIdRepo,
   seenMessageRepo,
   SendMessageRepo,
 } from "../Repository/Message.js";
@@ -45,6 +48,32 @@ export const GetAllMessageOfAConvo = async (convoid) => {
 export const SeenMessageService = async (convoid, userId) => {
   try {
     const res = await seenMessageRepo(convoid, userId);
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+export const GetMessageById = async (id) => {
+  try {
+    const res = await getMessageByIdRepo(id);
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const DeleteMessageForEveryone = async (id) => {
+  try {
+    const res = await DeleteMessageForEveryoneRepo(id);
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const DeletedById = async (id, user) => {
+  try {
+    const res = await DeletedMessageByidRepo(id, user);
     return res;
   } catch (error) {
     throw error;

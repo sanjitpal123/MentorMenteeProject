@@ -1,9 +1,12 @@
 import message from "../Model/Message.js";
 import { GetConvoByIdService } from "../Services/Conversation.js";
 import {
+  DeletedById,
+  DeleteMessageForEveryone,
   DeleteMessageService,
   EditMessageService,
   GetAllMessageOfAConvo,
+  GetMessageById,
   SeenMessageService,
   SendMessageService,
 } from "../Services/Message.js";
@@ -160,5 +163,64 @@ export const SeenMessage = async (req, res) => {
       error,
       message: "Internal server error",
     });
+  }
+};
+
+export const DeleteForEveryone = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const exited = await GetMessageById(id);
+    if (!exited) {
+      return res.status(404).json({
+        message: "Can not find any message with this id",
+        success: false,
+      });
+    }
+
+    const deleted = await DeleteMessageForEveryone(id);
+    if (!deleted) {
+      return res.status(403).json({
+        message: "Can not delete message",
+        success: false,
+      });
+    }
+    return res.status(201).json({
+      message: "Sucessfully Delete Message",
+      success: false,
+    });
+  } catch (error) {
+    console.log("error to dlete", error);
+    return res.status(501).json({
+      message: "Internal server error",
+      success: false,
+    });
+  }
+};
+
+export const DeleteForMe = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = req.user.userId;
+    const exited = await GetMessageById(id);
+
+    if (!exited) {
+      return res.status(404).json({
+        message: "can not get message with this id",
+        success: false,
+      });
+    }
+    const deleted = await DeletedById(id, user);
+    if (!deleted) {
+      return res.status(403).json({
+        message: "Can not delete message",
+        success: false,
+      });
+    }
+    return res.status(201).json({
+      message: "deleted message succesfully",
+      success: true,
+    });
+  } catch (error) {
+    console.log("error to delete for everyone ", error);
   }
 };

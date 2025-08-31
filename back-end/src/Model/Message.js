@@ -11,6 +11,11 @@ const MessageSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
+    isDeletedForEveryone: {
+      type: Boolean,
+      default: false,
+    },
+    deletedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     text: {
       type: String,
       required: true,

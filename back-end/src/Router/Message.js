@@ -1,5 +1,7 @@
 import express from "express";
 import {
+  DeleteForEveryone,
+  DeleteForMe,
   DeleteMessage,
   EditMessage,
   GetUserMessage,
@@ -13,5 +15,7 @@ MessageRouter.delete("/deletemessage/:id", Auth, DeleteMessage);
 MessageRouter.put("/editmessage/:id", Auth, EditMessage);
 MessageRouter.post("/getconvomessage", Auth, GetUserMessage);
 MessageRouter.post("/mark_seen", Auth, SeenMessage);
+MessageRouter.delete("/deleteforeveryone/:id", DeleteForEveryone);
+MessageRouter.delete("/deleteforme/:id", Auth, DeleteForMe);
 
 export default MessageRouter;

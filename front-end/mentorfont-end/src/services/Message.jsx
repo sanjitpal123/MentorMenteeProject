@@ -62,3 +62,25 @@ export const EditMessage = async (id, text, token) => {
     throw error;
   }
 };
+
+export const DeleteMessageForEveryoneService = async (id) => {
+  try {
+    const res = await axiosInstance.delete(`/message/deleteforeveryone/${id}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const DeleteForMeSer = async (id, token) => {
+  try {
+    const res = await axiosInstance.delete(`/message/deleteforme/${id}`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
