@@ -1030,6 +1030,8 @@ export const MessagesFromMentee = () => {
   async function DeleteForMe() {
     try {
       const res = await DeleteForMeSer(OpenId, user.token);
+      setisOpen(false);
+      GetMessages();
       console.log("responsive to delete for me ", res);
     } catch (error) {
       console.log("error to delete for me", error);
@@ -1172,7 +1174,7 @@ export const MessagesFromMentee = () => {
                     )}
 
                     {/* Message + Options */}
-                    {msg.text !== "" && (
+                    {msg.text !== "" && !msg.deletedBy.includes(user._id) ? (
                       <div className="text-base leading-relaxed flex items-start gap-3">
                         <p className="whitespace-pre-wrap">{msg.text}</p>
                         {isSender && (
@@ -1185,14 +1187,29 @@ export const MessagesFromMentee = () => {
                           </div>
                         )}
                       </div>
-                    )}
-                    {msg.text == "" && (
+                    ) : (
                       <div>
                         <i className="text-gray-500 italic">
                           This message was deleted
                         </i>
                       </div>
                     )}
+                    {/* {msg.text == "" &&
+                      msg.deletedBy.includes(user._id)?(
+                        <div>
+                          <i className="text-gray-500 italic">
+                            This message was deleted
+                          </i>
+                        </div>
+                      ):} */}
+
+                    {/* {msg.deletedBy.includes(user._id) && (
+                      <div>
+                        <i className="text-gray-500 italic">
+                          This message was deleted
+                        </i>
+                      </div>
+                    )} */}
 
                     {/* Time + Seen */}
                     <div className="flex items-center gap-2 mt-2 justify-end">
@@ -1208,7 +1225,9 @@ export const MessagesFromMentee = () => {
                           })}
                       </span>
 
-                      {isSender && msg.text !== "" ? (
+                      {isSender &&
+                      msg.text !== "" &&
+                      !msg.deletedBy.includes(user._id) ? (
                         <span
                           className={`text-xs font-semibold ${
                             msg.isRead ? "text-blue-400" : "text-gray-400"
