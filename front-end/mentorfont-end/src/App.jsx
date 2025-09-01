@@ -21,6 +21,7 @@ import { useContext } from "react";
 import ChatBox from "./pages/Chat";
 import MentorDashboard from "./pages/MentorDashboard";
 import AiDoubtSolver from "./pages/AiDoubtSolver";
+import MenteeDashboard from "./pages/MenteeDashboard";
 
 function App() {
   const { setUser, User } = useContext(GlobalContext);
@@ -56,7 +57,7 @@ function App() {
               user?.role == "mentor" ? <MentorDashboard /> : <Navigate to="/" />
             }
           />
-          <Route path="ai/assistant" element={<AiDoubtSolver />} />
+          <Route path="mentee/dashboard" element={<MenteeDashboard />} />
         </Route>
       </Routes>
     </Router>

@@ -171,7 +171,6 @@ import {
   SeenMessageMessage,
   sendMessage,
 } from "../services/Message";
-import { deleteModel } from "mongoose";
 
 // Exact colors (no Tailwind palette approximations)
 const COLORS = {

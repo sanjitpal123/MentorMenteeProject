@@ -12,7 +12,6 @@ import {
 } from "../services/Message";
 
 import { socket } from "../utils/socket";
-import { date } from "cohere-ai/core/schemas";
 function ChatBox() {
   const { User } = useContext(GlobalContext);
   const [Receiver, setReceiver] = useState([]);
