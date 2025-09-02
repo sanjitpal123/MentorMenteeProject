@@ -22,6 +22,7 @@ import ChatBox from "./pages/Chat";
 import MentorDashboard from "./pages/MentorDashboard";
 import AiDoubtSolver from "./pages/AiDoubtSolver";
 import MenteeDashboard from "./pages/MenteeDashboard";
+import ScheduleSession from "./pages/ScheduleSessionPage";
 
 function App() {
   const { setUser, User } = useContext(GlobalContext);
@@ -58,6 +59,7 @@ function App() {
             }
           />
           <Route path="mentee/dashboard" element={<MenteeDashboard />} />
+          <Route path="/createsession" element={<ScheduleSession />} />
         </Route>
       </Routes>
     </Router>

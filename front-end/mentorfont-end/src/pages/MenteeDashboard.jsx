@@ -53,7 +53,6 @@ import {
   ArrowLeft,
   ArrowRight,
   ExternalLink,
-  Link,
   Copy,
   Check,
   X,
@@ -120,7 +119,7 @@ import {
   RadialBarChart,
   RadialBar,
 } from "recharts";
-
+import { Link } from "react-router-dom";
 const MenteeDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -132,7 +131,7 @@ const MenteeDashboard = () => {
   // Placeholder functions for future implementation
   const handleAIRecommendations = () =>
     console.log("AI Recommendations feature");
-  const handleSmartScheduling = () => console.log("Smart Scheduling feature");
+
   const handleProgressPrediction = () =>
     console.log("Progress Prediction feature");
   const handlePersonalizedLearning = () =>
@@ -720,8 +719,8 @@ const MenteeDashboard = () => {
                     />
                     AI Insights
                   </button>
-                  <button
-                    onClick={handleSmartScheduling}
+                  <Link
+                    to="/createsession"
                     className="bg-gray-800/80 hover:bg-gray-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 border border-gray-700/60 hover:border-red-500 hover:scale-105 hover:-translate-y-1 group"
                   >
                     <Calendar
@@ -729,7 +728,7 @@ const MenteeDashboard = () => {
                       size={20}
                     />
                     Schedule
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -991,10 +990,7 @@ const MenteeDashboard = () => {
                         Next Sessions
                       </h3>
                     </div>
-                    <button
-                      onClick={handleSmartScheduling}
-                      className="text-blue-400 hover:text-blue-300 transition-colors duration-200 hover:scale-110 p-2 rounded-lg hover:bg-blue-600/20"
-                    >
+                    <button className="text-blue-400 hover:text-blue-300 transition-colors duration-200 hover:scale-110 p-2 rounded-lg hover:bg-blue-600/20">
                       <Plus size={22} />
                     </button>
                   </div>
@@ -1748,7 +1744,7 @@ const MenteeDashboard = () => {
         )}
       </div>
 
-      <style jsx>{`
+      {/* <style jsx>{`
         @keyframes fade-in {
           from {
             opacity: 0;
@@ -1840,7 +1836,7 @@ const MenteeDashboard = () => {
         .animation-delay-2000 {
           animation-delay: 2000ms;
         }
-      `}</style>
+      `}</style> */}
     </div>
   );
 };

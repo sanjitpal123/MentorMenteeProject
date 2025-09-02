@@ -28,6 +28,7 @@ const userSchema = mongoose.Schema(
         review: Number,
       },
     ],
+    sessions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Session" }],
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     mentees: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
