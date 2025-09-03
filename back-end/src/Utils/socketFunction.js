@@ -61,7 +61,14 @@ export const SocketServer = (socket, io) => {
     console.log("edit message");
     io.to(receiverId).emit("getEditMessage");
   });
+
+  socket.on("NotifySessionCreation", ({ receiverId }) => {
+    console.log("Notifing mentor about session ");
+    io.to(receiverId).emit("Notification");
+  });
+
   // for offline user
+
   socket.on("disconnect", () => {
     onlinusers = onlinusers.filter((u) => u.socketId !== socket.id);
     console.log("❌ user disconnected:", socket.id);

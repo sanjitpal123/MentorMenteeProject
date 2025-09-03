@@ -16,4 +16,5 @@ MainRouter.use("/message", MessageRouter);
 MainRouter.use("/mentor", MentorRouter);
 MainRouter.use("/mentee", MenteeRouter);
 MainRouter.use("/wishlist", WishListRouter);
+MainRouter.use("/notification", NotificationRouter);
 export default MainRouter;

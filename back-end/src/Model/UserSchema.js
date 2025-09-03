@@ -1,5 +1,6 @@
-import mongoose from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 import bcrypt from "bcrypt";
+import Notice from "./Notification.js";
 
 const userSchema = mongoose.Schema(
   {
@@ -20,6 +21,7 @@ const userSchema = mongoose.Schema(
     github: { type: String },
     experience: { type: Number },
     price: { type: Number },
+    notication: [{ type: mongoose.Schema.Types.ObjectId, ref: "Notice" }],
     reviews: [
       {
         type: mongoose.Schema.Types.ObjectId,

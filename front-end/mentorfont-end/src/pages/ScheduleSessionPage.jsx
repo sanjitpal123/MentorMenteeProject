@@ -5,6 +5,8 @@ import GetAllMentosService from "../services/GetAllmentors";
 import CreateSessionSer from "../services/Session";
 import { GlobalContext } from "../ContextApiStore/ContextStore";
 import { useNavigate } from "react-router-dom";
+import { socket } from "../utils/socket";
+import { CreateNotificationSer } from "../services/Notification";
 
 export default function ScheduleSession() {
   const { User } = useContext(GlobalContext);
@@ -19,6 +21,17 @@ export default function ScheduleSession() {
     topic: "",
   });
 
+  // create notification
+  async function CreateNotification() {
+    try {
+      const res = await CreateNotificationSer({
+        receiver: FormData.mentor,
+        message: `A New Session Is by ${user.name}`,
+      });
+    } catch (error) {
+      console.log("error to create notification", error);
+    }
+  }
   async function GetAllMentor() {
     try {
       const res = await GetAllMentosService();
@@ -33,6 +46,7 @@ export default function ScheduleSession() {
     try {
       const res = await CreateSessionSer(FormData, user.token);
       console.log("response to create session", res);
+      socket.emit("NotifySessionCreation", { receiverId: FormData.mentor });
       Navigate("/mentee/dashboard");
     } catch (error) {
       console.log("error to create session", error);

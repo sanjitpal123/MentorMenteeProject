@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LiveSession,
   RecentActivities,
@@ -43,11 +43,19 @@ import {
   Bookmark,
 } from "lucide-react";
 
+import { socket } from "../utils/socket";
 export default function MentorDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showCreateSession, setShowCreateSession] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
+
+  useEffect(() => {
+    const handleNotification = () => {
+      console.log("New Session Has Been Created");
+    };
+    socket.on("Notification", handleNotification);
+  }, []);
 
   const renderContent = () => {
     switch (activeTab) {
