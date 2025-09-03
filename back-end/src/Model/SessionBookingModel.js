@@ -22,6 +22,7 @@ const SessionBooking = new mongoose.Schema(
       type: String,
       required: true,
       enum: ["pending", "confirm", "complete", "calcalled"],
+      default: "pending",
     },
     notes: {
       type: String,

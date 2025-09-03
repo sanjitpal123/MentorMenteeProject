@@ -1,17 +1,51 @@
 // src/pages/ScheduleSession.jsx
-import { useState } from "react";
-import { Calendar, X } from "lucide-react";
-import TagInput from "../components/Home/TagInput";
+import { useContext, useEffect, useState } from "react";
+import { Calendar } from "lucide-react";
+import GetAllMentosService from "../services/GetAllmentors";
+import CreateSessionSer from "../services/Session";
+import { GlobalContext } from "../ContextApiStore/ContextStore";
+import { useNavigate } from "react-router-dom";
 
 export default function ScheduleSession() {
-  const [tags, setTags] = useState([]);
+  const { User } = useContext(GlobalContext);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const Navigate = useNavigate();
   const [selectedMentor, setSelectedMentor] = useState(null);
+  const [Mentors, setMentors] = useState([]);
+  const [FormData, setFormData] = useState({
+    mentor: null,
+    date: "",
+    notes: "",
+    topic: "",
+  });
 
-  const mentors = [
-    { id: 1, name: "John Doe", title: "React Mentor" },
-    { id: 2, name: "Jane Smith", title: "System Design Mentor" },
-    { id: 3, name: "Alex Carter", title: "DSA Mentor" },
-  ];
+  async function GetAllMentor() {
+    try {
+      const res = await GetAllMentosService();
+      console.log("getting all mentors in schedule page", res);
+      setMentors(res);
+    } catch (error) {
+      console.log("error to get all mentors in schedule page", error);
+    }
+  }
+
+  async function handleCreateSchedule() {
+    try {
+      const res = await CreateSessionSer(FormData, user.token);
+      console.log("response to create session", res);
+      Navigate("/mentee/dashboard");
+    } catch (error) {
+      console.log("error to create session", error);
+    }
+  }
+
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, mentor: selectedMentor?._id }));
+  }, [selectedMentor]);
+
+  useEffect(() => {
+    GetAllMentor();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white p-6">
@@ -24,55 +58,62 @@ export default function ScheduleSession() {
           </h2>
 
           <div className="space-y-4">
-            <div>
-              <label className="block text-gray-300 text-sm mb-1">Title</label>
-              <input
-                placeholder="e.g. React Basics"
-                className="w-full bg-gray-900/60 border border-gray-700/60 px-3 py-2 rounded-md"
-              />
-            </div>
-
+            {/* Date & Time */}
             <div>
               <label className="block text-gray-300 text-sm mb-1">
                 Date & Time
               </label>
               <input
                 type="datetime-local"
+                name="date"
+                value={FormData.date}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    [e.target.name]: e.target.value,
+                  }))
+                }
                 className="w-full bg-gray-900/60 border border-gray-700/60 px-3 py-2 rounded-md"
               />
             </div>
 
+            {/* Topic */}
             <div>
-              <label className="block text-gray-300 text-sm mb-1">
-                Duration (minutes)
-              </label>
+              <label className="block text-gray-300 text-sm mb-1">Topic</label>
               <input
-                type="number"
-                min="15"
-                defaultValue="60"
+                type="text"
+                name="topic"
+                placeholder="What will be the topic"
+                value={FormData.topic}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    [e.target.name]: e.target.value,
+                  }))
+                }
                 className="w-full bg-gray-900/60 border border-gray-700/60 px-3 py-2 rounded-md"
               />
             </div>
 
-            <div>
-              <label className="block text-gray-300 text-sm mb-1">Topics</label>
-              <TagInput tags={tags} setTags={setTags} />
-            </div>
-
+            {/* Description */}
             <div>
               <label className="block text-gray-300 text-sm mb-1">
                 Description
               </label>
               <textarea
                 rows={4}
+                name="notes"
                 placeholder="Describe the session goals..."
+                value={FormData.notes}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    [e.target.name]: e.target.value,
+                  }))
+                }
                 className="w-full bg-gray-900/60 border border-gray-700/60 px-3 py-2 rounded-md"
               />
             </div>
-
-            <button className="w-full bg-red-600 hover:bg-red-700 py-3 rounded-lg font-semibold">
-              Schedule Session
-            </button>
           </div>
         </div>
 
@@ -80,27 +121,57 @@ export default function ScheduleSession() {
         <div className="bg-gradient-to-br from-[#0f1416] to-[#231213] border border-red-900/20 rounded-2xl p-6 shadow-xl">
           <h3 className="text-lg font-bold mb-4">Choose a Mentor</h3>
 
-          <div className="space-y-3 max-h-[65vh] overflow-y-auto pr-2">
-            {mentors.map((m) => (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 max-h-[65vh] overflow-y-auto pr-2">
+            {Mentors.map((m) => (
               <div
-                key={m.id}
+                key={m._id}
                 onClick={() => setSelectedMentor(m)}
-                className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border transition ${
-                  selectedMentor?.id === m.id
+                className={`p-4 rounded-2xl border transition cursor-pointer shadow-sm ${
+                  selectedMentor?._id === m._id
                     ? "border-red-500 bg-red-900/10"
                     : "border-gray-800 hover:border-red-600"
                 }`}
               >
-                <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center text-red-400 font-bold">
-                  {m.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
+                {/* Avatar / initials */}
+                <div className="flex items-center gap-3">
+                  {m.profile ? (
+                    <img
+                      src={m.profile}
+                      alt={m.name}
+                      className="w-14 h-14 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-14 h-14 rounded-full bg-gray-800 flex items-center justify-center text-red-400 font-bold text-lg">
+                      {m.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </div>
+                  )}
+                  <div>
+                    <div className="font-semibold text-lg">{m.name}</div>
+                    <div className="text-sm text-gray-400">{m.title}</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-semibold">{m.name}</div>
-                  <div className="text-sm text-gray-400">{m.title}</div>
-                </div>
+
+                {/* Description */}
+                <p className="mt-3 text-gray-300 text-sm line-clamp-2">
+                  {m.description || "No description available."}
+                </p>
+
+                {/* Skills */}
+                {m.skills && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {m.skills.map((skill, i) => (
+                      <span
+                        key={i}
+                        className="px-2 py-1 text-xs rounded-full bg-red-500/10 text-red-400 border border-red-500/20"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -109,12 +180,20 @@ export default function ScheduleSession() {
             <h4 className="text-sm text-gray-300 mb-2">Selected Mentor</h4>
             {selectedMentor ? (
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center text-red-400 font-bold">
-                  {selectedMentor.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </div>
+                {selectedMentor?.profile ? (
+                  <img
+                    src={selectedMentor.profile}
+                    alt={selectedMentor.name}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center text-red-400 font-bold">
+                    {selectedMentor?.name
+                      ?.split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </div>
+                )}
                 <div>
                   <div className="font-semibold">{selectedMentor.name}</div>
                   <div className="text-xs text-gray-400">
@@ -125,6 +204,15 @@ export default function ScheduleSession() {
             ) : (
               <p className="text-gray-500 text-sm">No mentor selected</p>
             )}
+          </div>
+
+          <div>
+            <button
+              className="w-full mt-10 bg-red-600 hover:bg-red-700 py-3 rounded-lg font-semibold"
+              onClick={handleCreateSchedule}
+            >
+              Schedule Session
+            </button>
           </div>
         </div>
       </div>
