@@ -1,3 +1,5 @@
+import message from "../Model/Message.js";
+import User from "../Model/UserSchema.js";
 import {
   CancelledSessionService,
   CreateSessionService,
@@ -22,12 +24,31 @@ export const CreateSession = async (req, res) => {
       topic,
       mentee,
     });
+    const menteeProile = await User.findById(mentee);
+    if (!menteeProile) {
+      return res.status(404).json({
+        success: false,
+        message: "mentee id is not present with this id",
+      });
+    }
+    const mentorProfile = await User.findById(mentor);
+    if (!mentorProfile) {
+      return res.status(404).json({
+        message: "Can not get mentor ",
+        success: false,
+      });
+    }
     if (!session) {
       return res.status(401).json({
         message: "Can not create session",
         success: false,
       });
     }
+
+    menteeProile.sessions.push(session._id);
+    mentorProfile.sessions.push(session._id);
+    await menteeProile.save();
+    await mentorProfile.save();
     return res.status(201).json({
       message: "Session is created successfully",
       session,

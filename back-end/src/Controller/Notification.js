@@ -1,12 +1,18 @@
-import { CreateNotificationService } from "../Services/Notification";
+import { CreateNotificationService } from "../Services/Notification.js";
 
 import User from "../Model/UserSchema.js";
 export const CreateNotice = async (req, res) => {
   try {
-    const { receiver, message, type, isRead } = req.body;
+    const { receiver, message, type, isRead, title, convoId, sessionId } =
+      req.body;
+    const sender = req.user.userId;
     const Created = await CreateNotificationService({
       receiver,
       message,
+      sender,
+      convoId,
+      sessionId,
+      title,
       type,
       isRead,
     });
@@ -18,7 +24,8 @@ export const CreateNotice = async (req, res) => {
       });
     }
 
-    const user = await User.findById(Created.receiver);
+    const user = await User.findById(receiver);
+    console.log("mentor", user);
     if (!user) {
       return res.status(404).json({
         message: "Can not user with this id ",

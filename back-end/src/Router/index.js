@@ -7,6 +7,7 @@ import MessageRouter from "./Message.js";
 import MentorRouter from "./Mentorroute.js";
 import MenteeRouter from "./MenteeRouter.js";
 import WishListRouter from "./WishList.js";
+import NotificationRouter from "./NotificationRouter.js";
 const MainRouter = express.Router();
 MainRouter.use("/auth", AuthRouter);
 MainRouter.use("/user", UserRouter);

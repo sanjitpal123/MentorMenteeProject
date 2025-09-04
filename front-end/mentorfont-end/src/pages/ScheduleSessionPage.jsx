@@ -14,6 +14,7 @@ export default function ScheduleSession() {
   const Navigate = useNavigate();
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [Mentors, setMentors] = useState([]);
+  const [sessionId, setSessionId] = useState(null);
   const [FormData, setFormData] = useState({
     mentor: null,
     date: "",
@@ -22,12 +23,20 @@ export default function ScheduleSession() {
   });
 
   // create notification
-  async function CreateNotification() {
+  async function CreateNotification(sessionid) {
+    console.log("session id is coming", sessionid);
     try {
-      const res = await CreateNotificationSer({
+      const data = {
         receiver: FormData.mentor,
-        message: `A New Session Is by ${user.name}`,
-      });
+        title: `A New Session Is Created by ${user.name}`,
+        message: `A new session has been created by ${user.name} if you are available and if you think that you can be available so accepts otherwise cancel it `,
+        sender: user._id,
+        sessionId: sessionid,
+        isRead: false,
+        type: "info",
+      };
+      const res = await CreateNotificationSer(data, user.token);
+      console.log("response to create notification", res);
     } catch (error) {
       console.log("error to create notification", error);
     }
@@ -47,6 +56,7 @@ export default function ScheduleSession() {
       const res = await CreateSessionSer(FormData, user.token);
       console.log("response to create session", res);
       socket.emit("NotifySessionCreation", { receiverId: FormData.mentor });
+      CreateNotification(res.session._id);
       Navigate("/mentee/dashboard");
     } catch (error) {
       console.log("error to create session", error);
