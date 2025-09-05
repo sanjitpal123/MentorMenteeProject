@@ -44,6 +44,7 @@ import {
 } from "lucide-react";
 
 import { socket } from "../utils/socket";
+import Notification from "../components/Notification";
 export default function MentorDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -695,7 +696,9 @@ export default function MentorDashboard() {
             </div>
           </div>
         );
-
+      case "notification": {
+        return <Notification />;
+      }
       default:
         return <div className="text-white">Content for {activeTab}</div>;
     }
@@ -734,6 +737,7 @@ export default function MentorDashboard() {
           <nav className="mt-8 px-4 space-y-2">
             {[
               { id: "dashboard", icon: Home, label: "Dashboard" },
+              { id: "notification", icon: Home, label: "Notification" },
               { id: "sessions", icon: Video, label: "Sessions" },
               { id: "mentees", icon: Users, label: "Mentees" },
               { id: "messages", icon: MessageSquare, label: "Messages" },

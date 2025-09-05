@@ -12,3 +12,18 @@ export const CreateNotificationSer = async (data, token) => {
     throw error;
   }
 };
+
+export const GetNotification = async (token) => {
+  try {
+    console.log("token to get notification", token);
+    const res = await axiosInstance.get("/notification/getnotfication", {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.log("error in getting notification", error);
+    throw error;
+  }
+};

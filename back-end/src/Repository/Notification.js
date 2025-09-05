@@ -8,3 +8,13 @@ export const CreateNotificationRepo = async (data) => {
     throw error;
   }
 };
+
+export const GetUserNotificationRepo = async (userId) => {
+  try {
+    const res = await Notification.find({ receiver: userId });
+    return res;
+  } catch (error) {
+    console.log("error", error);
+    throw error;
+  }
+};

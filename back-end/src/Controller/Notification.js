@@ -1,4 +1,7 @@
-import { CreateNotificationService } from "../Services/Notification.js";
+import {
+  CreateNotificationService,
+  GetAUserNotificationById,
+} from "../Services/Notification.js";
 
 import User from "../Model/UserSchema.js";
 export const CreateNotice = async (req, res) => {
@@ -44,6 +47,28 @@ export const CreateNotice = async (req, res) => {
     return res.status(501).json({
       message: "Internal server error",
       success: false,
+    });
+  }
+};
+
+export const GetAUserNotification = async (req, res) => {
+  try {
+    const receiver = req.user.userId;
+    const notification = await GetAUserNotificationById(receiver);
+    if (!notification) {
+      return res.status(404).json({
+        success: false,
+        message: "Can not get notifications",
+      });
+    }
+    return res.status(201).json({
+      success: true,
+      notification,
+    });
+  } catch (error) {
+    console.group("error", error);
+    return res.status(501).json({
+      message: "Internal server error",
     });
   }
 };
