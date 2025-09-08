@@ -9,22 +9,20 @@ export const CreateSessionRepo = async (data) => {
   }
 };
 
-export const GetASessionByIdRepo=async(id)=>{
-  try{
-    const session=await Session.findById(id);
+export const GetASessionByIdRepo = async (id) => {
+  try {
+    const session = await Session.findById(id);
     return session;
-
-  }catch(error)
-  {
+  } catch (error) {
     throw error;
   }
-}
+};
 
 export const RescheduleRepo = async (id, date) => {
   try {
     const updated = await Session.findByIdAndUpdate(
       id,
-      { date: date },  // wrap in object
+      { date: date }, // wrap in object
       { new: true }
     );
     return updated;
@@ -32,15 +30,25 @@ export const RescheduleRepo = async (id, date) => {
     throw error;
   }
 };
-export const CancelledSessionRepo=async(id)=>
-{
-  try{
-    const datedone=await Session.findByIdAndDelete(id);
+export const CancelledSessionRepo = async (id) => {
+  try {
+    const datedone = await Session.findByIdAndDelete(id);
     return datedone;
-
-  }catch(error)
-  {
+  } catch (error) {
     throw error;
   }
+};
 
-}
+export const UpdateSessionByIdRepo = async (id, status) => {
+  try {
+    const res = await Session.findByIdAndUpdate(
+      id,
+      { $set: { status } },
+      { new: true }
+    );
+    return res;
+  } catch (error) {
+    console.log("error", error);
+    throw error;
+  }
+};

@@ -11,7 +11,9 @@ export const CreateNotificationRepo = async (data) => {
 
 export const GetUserNotificationRepo = async (userId) => {
   try {
-    const res = await Notification.find({ receiver: userId });
+    const res = await Notification.find({ receiver: userId }).populate(
+      "sessionId"
+    );
     return res;
   } catch (error) {
     console.log("error", error);

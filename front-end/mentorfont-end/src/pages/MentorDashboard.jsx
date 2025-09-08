@@ -45,6 +45,7 @@ import {
 
 import { socket } from "../utils/socket";
 import Notification from "../components/Notification";
+import { toast } from "react-toastify";
 export default function MentorDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -53,9 +54,13 @@ export default function MentorDashboard() {
 
   useEffect(() => {
     const handleNotification = () => {
-      console.log("New Session Has Been Created");
+      toast.dismiss();
+      toast.info("New Session Has Been Created");
     };
     socket.on("Notification", handleNotification);
+    return () => {
+      socket.off("Notification", handleNotification);
+    };
   }, []);
 
   const renderContent = () => {

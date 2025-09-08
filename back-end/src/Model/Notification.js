@@ -30,7 +30,7 @@ const NotificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["warn", "danger", "feedback", "info"],
+      enum: ["warn", "danger", "feedback", "info", "session"],
       default: "info",
     },
     isRead: {

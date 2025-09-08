@@ -1,10 +1,12 @@
 import message from "../Model/Message.js";
+import Session from "../Model/SessionBookingModel.js";
 import User from "../Model/UserSchema.js";
 import {
   CancelledSessionService,
   CreateSessionService,
   GetASessionByid,
   RescheduleService,
+  UpdateSessionByIdService,
 } from "../Services/Session.Service.js";
 
 export const CreateSession = async (req, res) => {
@@ -139,6 +141,50 @@ export const CancelledSessions = async (req, res) => {
     });
   } catch (error) {
     console.log("error", error);
+    return res.status(501).json({
+      message: "Internal server error",
+      success: false,
+    });
+  }
+};
+
+export const UpdateASession = async (req, res) => {
+  try {
+    const { status, id, mentor } = req.body;
+    const isExisted = await GetASessionByid(id);
+    if (!isExisted) {
+      return res.status(404).json({
+        message: "Does not exist any session with this id",
+        success: false,
+      });
+    }
+    if (isExisted.mentor.toString() !== mentor.toString()) {
+      return res.status(401).json({
+        message: "unauthenticated",
+        success: false,
+      });
+    }
+
+    if (!status) {
+      return res.status(403).json({
+        message: "status is empty",
+        success: false,
+      });
+    }
+    const updated = await UpdateSessionByIdService(id, status);
+    if (!updated) {
+      return res.status(404).json({
+        message: "can not update Message",
+        success: false,
+      });
+    }
+    return res.status(201).json({
+      message: "Session is updated",
+      success: true,
+      updated,
+    });
+  } catch (error) {
+    console.log("error to updateSession", error);
     return res.status(501).json({
       message: "Internal server error",
       success: false,

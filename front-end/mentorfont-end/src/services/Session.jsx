@@ -15,3 +15,16 @@ async function CreateSessionSer(FormData, token) {
 }
 
 export default CreateSessionSer;
+
+export const UpdateStatus = async (formdata, token) => {
+  try {
+    const res = await axiosInstance.post("/session/updatesession", formdata, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

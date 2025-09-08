@@ -11,6 +11,8 @@ import HomePage from "./pages/HomePage";
 import BrowseMentor from "./pages/BrowseMentor";
 import MentorView from "./pages/MentorView";
 import Layout from "./components/Layout";
+import { ToastContainer, toast } from "react-toastify";
+
 import {
   GlobalContext,
   GlobalContextProvider,
@@ -30,39 +32,46 @@ function App() {
   console.log("set", user);
 
   return (
-    <Router>
-      <Routes>
-        {" "}
-        <Route path="/" element={<Layout />}>
-          <Route
-            index
-            element={
-              user?.role == "mentor" ? (
-                <Navigate to="/mentor/dashboard" />
-              ) : (
-                <HomePage />
-              )
-            }
-          />
+    <>
+      <Router>
+        <Routes>
+          {" "}
+          <Route path="/" element={<Layout />}>
+            <Route
+              index
+              element={
+                user?.role == "mentor" ? (
+                  <Navigate to="/mentor/dashboard" />
+                ) : (
+                  <HomePage />
+                )
+              }
+            />
 
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/browse-mentor" element={<BrowseMentor />} />
-          <Route path="/mentor-view" element={<MentorView />} />
-          <Route path="/become-mentor" element={<BecomeMentor />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/chat/:id" element={<ChatBox />} />
-          <Route
-            path="/mentor/dashboard"
-            element={
-              user?.role == "mentor" ? <MentorDashboard /> : <Navigate to="/" />
-            }
-          />
-          <Route path="mentee/dashboard" element={<MenteeDashboard />} />
-          <Route path="/createsession" element={<ScheduleSession />} />
-        </Route>
-      </Routes>
-    </Router>
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/browse-mentor" element={<BrowseMentor />} />
+            <Route path="/mentor-view" element={<MentorView />} />
+            <Route path="/become-mentor" element={<BecomeMentor />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/chat/:id" element={<ChatBox />} />
+            <Route
+              path="/mentor/dashboard"
+              element={
+                user?.role == "mentor" ? (
+                  <MentorDashboard />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
+            <Route path="mentee/dashboard" element={<MenteeDashboard />} />
+            <Route path="/createsession" element={<ScheduleSession />} />
+          </Route>
+        </Routes>
+      </Router>
+      <ToastContainer />
+    </>
   );
 }
 

@@ -120,6 +120,7 @@ import {
   RadialBar,
 } from "recharts";
 import { Link } from "react-router-dom";
+import { socket } from "../utils/socket";
 const MenteeDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -149,6 +150,9 @@ const MenteeDashboard = () => {
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
+    socket.on("StatusUpdateOfSession", () => {
+      console.log("session updated from back-end");
+    });
   }, []);
 
   // Enhanced mock data

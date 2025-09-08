@@ -33,7 +33,7 @@ export default function ScheduleSession() {
         sender: user._id,
         sessionId: sessionid,
         isRead: false,
-        type: "info",
+        type: "session",
       };
       const res = await CreateNotificationSer(data, user.token);
       console.log("response to create notification", res);

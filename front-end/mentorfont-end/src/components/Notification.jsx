@@ -10,24 +10,44 @@ import {
 } from "lucide-react";
 import { GetNotification } from "../services/Notification";
 import { GlobalContext } from "../ContextApiStore/ContextStore";
+import { UpdateStatus } from "../services/Session";
+import { socket } from "../utils/socket";
 
 function Notification() {
   const [Notifications, setNotifications] = useState([]);
   const { User } = useContext(GlobalContext);
   const user = JSON.parse(localStorage.getItem("user"));
-
-  useEffect(() => {
-    async function GetAllNotification() {
-      try {
-        const res = await GetNotification(user.token);
-        setNotifications(res.notification || []);
-        console.log("response to get notification", res);
-      } catch (error) {
-        console.log("error to get notification", error);
-      }
+  async function GetAllNotification() {
+    try {
+      const res = await GetNotification(user.token);
+      setNotifications(res.notification || []);
+      console.log("response to get notification", res);
+    } catch (error) {
+      console.log("error to get notification", error);
     }
+  }
+  useEffect(() => {
     GetAllNotification();
   }, []);
+
+  async function handleAccept(note) {
+    try {
+      console.log("id to update", note);
+      const data = {
+        status: "confirm",
+        id: note.sessionId._id,
+        mentor: user._id,
+      };
+      const res = await UpdateStatus(data, user.token);
+      console.log("status to update", res);
+      socket.emit("NotifySessionStatusUpdate", {
+        receiverId: note.sessionId.mentee,
+      });
+      GetAllNotification();
+    } catch (error) {
+      console.log("error to get update status of session", error);
+    }
+  }
 
   const getIcon = (type) => {
     switch (type) {
@@ -68,6 +88,25 @@ function Notification() {
     return "just now";
   };
 
+  const handleCancel = async (note) => {
+    try {
+      console.log("id to update", note);
+      const data = {
+        status: "calcalled",
+        id: note.sessionId._id,
+        mentor: user._id,
+      };
+      const res = await UpdateStatus(data, user.token);
+      socket.emit("NotifySessionStatusUpdate", {
+        receiverId: note.sessionId.mentee,
+      });
+      console.log("status to cancel", res);
+      GetAllNotification();
+    } catch (error) {
+      console.log("response to cancel status", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center py-10 px-4">
       {/* Header */}
@@ -98,6 +137,23 @@ function Notification() {
                 <p className="text-sm text-gray-400 mt-1">{note.message}</p>
                 <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
                   <Clock className="w-4 h-4" /> {formatTime(note.createdAt)}
+                  {note.type == "session" &&
+                    note.sessionId.status == "pending" && (
+                      <div className="flex gap-2 ml-10">
+                        <button
+                          className="py-2 px-4 bg-green-400 text-white rounded-md"
+                          onClick={() => handleAccept(note)}
+                        >
+                          Accept
+                        </button>
+                        <button
+                          className="py-2 px-4 bg-red-400 text-white rounded-md"
+                          onClick={() => handleCancel(note)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
                 </p>
               </div>
             </div>
