@@ -68,7 +68,7 @@ export const SocketServer = (socket, io) => {
   });
 
   socket.on("NotifySessionStatusUpdate", ({ receiverId }) => {
-    console.log("Notifying mentee about session status");
+    console.log("Notifying mentee about session status", receiverId);
     io.to(receiverId).emit("StatusUpdateOfSession");
   });
 
