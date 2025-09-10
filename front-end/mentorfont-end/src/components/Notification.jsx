@@ -17,6 +17,7 @@ function Notification() {
   const [Notifications, setNotifications] = useState([]);
   const { User } = useContext(GlobalContext);
   const user = JSON.parse(localStorage.getItem("user"));
+
   async function GetAllNotification() {
     try {
       const res = await GetNotification(user.token);
@@ -26,6 +27,7 @@ function Notification() {
       console.log("error to get notification", error);
     }
   }
+
   useEffect(() => {
     GetAllNotification();
   }, []);

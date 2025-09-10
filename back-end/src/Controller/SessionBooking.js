@@ -4,6 +4,7 @@ import User from "../Model/UserSchema.js";
 import {
   CancelledSessionService,
   CreateSessionService,
+  GetAllSessions,
   GetASessionByid,
   RescheduleService,
   UpdateSessionByIdService,
@@ -189,5 +190,24 @@ export const UpdateASession = async (req, res) => {
       message: "Internal server error",
       success: false,
     });
+  }
+};
+
+export const GetAllSession = async (req, res) => {
+  try {
+    const authuser = req.user.userId;
+    const response = await GetAllSessions(authuser);
+    if (!response) {
+      return res.status(404).json({
+        success: false,
+        message: "Can not find any messages from authuser",
+      });
+    }
+    return res.status(201).json({
+      success: true,
+      response,
+    });
+  } catch (error) {
+    console.log("error to get sessions", error);
   }
 };

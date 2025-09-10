@@ -148,14 +148,35 @@ const MenteeDashboard = () => {
   const handleCodeReviewAI = () => console.log("AI Code Review feature");
 
   useEffect(() => {
+    const handleStatusUpdate = () => {
+      console.log("status is updated from mentor");
+    };
+
+    // attach socket listener
+    socket.on("StatusUpdateOfSession", handleStatusUpdate);
+
+    // start timer
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-    socket.on("StatusUpdateOfSession", () => {
-      console.log("session updated from back-end");
-    });
+
+    // cleanup both socket listener & timer
+    return () => {
+      socket.off("StatusUpdateOfSession", handleStatusUpdate);
+      clearInterval(timer);
+    };
   }, []);
 
+  useEffect(() => {
+    const handleNotification = () => {
+      toast.dismiss();
+      toast.info("New Session Has Been Created");
+    };
+    socket.on("StatusUpdateOfSession", handleNotification);
+    return () => {
+      socket.off("StatusUpdateOfSession", handleNotification);
+    };
+  }, []);
   // Enhanced mock data
+
   const menteeData = {
     name: "Alexandra Chen",
     avatar:

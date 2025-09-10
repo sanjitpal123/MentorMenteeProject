@@ -52,3 +52,16 @@ export const UpdateSessionByIdRepo = async (id, status) => {
     throw error;
   }
 };
+
+export const GetAllSessionRepo = async (userId) => {
+  try {
+    const res = await Session.find({
+      $or: [{ mentor: userId }, { mentee: userId }],
+    })
+      .populate("mentor")
+      .populate("mentee");
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};

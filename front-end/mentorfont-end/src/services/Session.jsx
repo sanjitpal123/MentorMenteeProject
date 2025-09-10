@@ -28,3 +28,16 @@ export const UpdateStatus = async (formdata, token) => {
     throw error;
   }
 };
+
+export const GetAllSessionSer = async (token) => {
+  try {
+    const res = await axiosInstance.get("/session/getallsession", {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

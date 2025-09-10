@@ -1,6 +1,7 @@
 import {
   CancelledSessionRepo,
   CreateSessionRepo,
+  GetAllSessionRepo,
   GetASessionByIdRepo,
   RescheduleRepo,
   UpdateSessionByIdRepo,
@@ -46,5 +47,14 @@ export const UpdateSessionByIdService = async (id, status) => {
     return updated;
   } catch (error) {
     throw error;
+  }
+};
+
+export const GetAllSessions = async (userid) => {
+  try {
+    const getall = await GetAllSessionRepo(userid);
+    return getall;
+  } catch (error) {
+    cons;
   }
 };
