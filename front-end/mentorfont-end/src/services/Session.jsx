@@ -41,3 +41,21 @@ export const GetAllSessionSer = async (token) => {
     throw error;
   }
 };
+
+export const searchSession = async (token, query) => {
+  try {
+    console.log("session token", token);
+    const res = await axiosInstance.post(
+      "/session/search",
+      { query }, // request body
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

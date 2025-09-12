@@ -1,12 +1,14 @@
 import message from "../Model/Message.js";
 import Session from "../Model/SessionBookingModel.js";
 import User from "../Model/UserSchema.js";
+import { sessionSearchRepo } from "../Repository/sessionRepo.js";
 import {
   CancelledSessionService,
   CreateSessionService,
   GetAllSessions,
   GetASessionByid,
   RescheduleService,
+  sessionSearchService,
   UpdateSessionByIdService,
 } from "../Services/Session.Service.js";
 
@@ -209,5 +211,28 @@ export const GetAllSession = async (req, res) => {
     });
   } catch (error) {
     console.log("error to get sessions", error);
+  }
+};
+
+export const searchSession = async (req, res) => {
+  try {
+    const { query } = req.body;
+    const sessions = await sessionSearchService(query);
+    if (!sessions) {
+      return res.status(404).json({
+        message: "Can not get sessions ",
+        success: false,
+      });
+    }
+    return res.status(201).json({
+      success: true,
+      session: sessions,
+    });
+  } catch (error) {
+    console.log("error to serach", error);
+    return res.status(501).json({
+      message: "Internal server error",
+      success: false,
+    });
   }
 };

@@ -171,7 +171,11 @@ import {
   SeenMessageMessage,
   sendMessage,
 } from "../services/Message";
-import { GetAllSessionSer } from "../services/Session";
+import {
+  GetAllSessionSer,
+  searchSession,
+  UpdateStatus,
+} from "../services/Session";
 
 // Exact colors (no Tailwind palette approximations)
 const COLORS = {
@@ -946,8 +950,11 @@ export const MessagesFromMentee = () => {
 
 export const AllSession = () => {
   const [sessions, setSession] = useState([]);
+  const [query, setQuery] = useState("");
+  const [debouncingQuery, setdebouncingQuery] = useState("");
   const { User } = useContext(GlobalContext);
   const wholeobject = JSON.parse(localStorage.getItem("user"));
+  const [filterText, setFilterText] = useState("All");
   const GetAllSession = async () => {
     try {
       const res = await GetAllSessionSer(wholeobject.token);
@@ -957,10 +964,85 @@ export const AllSession = () => {
       console.log("error to get session", error);
     }
   };
+
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setdebouncingQuery(query);
+    }, 1000);
+    return () => {
+      clearTimeout(handle);
+    };
+  }, [query]);
+
+  async function searchSessions() {
+    try {
+      const res = await searchSession(wholeobject.token, debouncingQuery);
+      console.log("response to get all search session", res);
+      setSession(res.session);
+    } catch (error) {
+      console.log("error to get session", error);
+    }
+  }
+
+  useEffect(() => {
+    searchSessions();
+  }, [debouncingQuery]);
+  const handleCancel = async (session) => {
+    try {
+      const data = {
+        status: "calcalled",
+        id: session._id,
+        mentor: wholeobject._id,
+      };
+      const res = await UpdateStatus(data, wholeobject.token);
+      socket.emit("NotifySessionStatusUpdate", {
+        receiverId: session.mentee,
+      });
+      console.log("status to cancel", res);
+      GetAllSession();
+    } catch (error) {
+      console.log("response to cancel status", error);
+    }
+  };
+
+  // handle filter button
+  function handleFilterClick(text) {
+    if (text == "All") {
+      GetAllSession();
+    } else {
+      setFilterText(text);
+    }
+  }
+  function handleFilterByCategory() {
+    try {
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
+
+  async function handleAccept(session) {
+    try {
+      const data = {
+        status: "confirm",
+        id: session._id,
+        mentor: wholeobject._id,
+      };
+      const res = await UpdateStatus(data, wholeobject.token);
+      console.log("status to update", res);
+      socket.emit("NotifySessionStatusUpdate", {
+        receiverId: session.mentee,
+      });
+      GetAllSession();
+    } catch (error) {
+      console.log("error to get update status of session", error);
+    }
+  }
+
   useEffect(() => {
     GetAllSession();
     console.log("sesion", sessions);
   }, []);
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -985,14 +1067,17 @@ export const AllSession = () => {
       <div className="bg-gradient-to-br from-gray-900/80 to-black/60 p-6 rounded-2xl border border-red-500/20">
         <div className="flex flex-wrap gap-4 items-center justify-between">
           <div className="flex gap-2">
-            {["All", "Live", "Upcoming", "Completed"].map((filter) => (
-              <button
-                key={filter}
-                className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-600/20 to-red-700/20 text-red-200 hover:from-red-600/30 hover:to-red-700/30 transition-all duration-300 border border-red-500/30"
-              >
-                {filter}
-              </button>
-            ))}
+            {["All", "Live", "Upcoming", "Completed", "Confirm", "Pending"].map(
+              (filter) => (
+                <button
+                  key={filter}
+                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-600/20 to-red-700/20 text-red-200 hover:from-red-600/30 hover:to-red-700/30 transition-all duration-300 border border-red-500/30"
+                  onClick={() => handleFilterClick(filter)}
+                >
+                  {filter}
+                </button>
+              )
+            )}
           </div>
           <div className="flex gap-3">
             <div className="relative">
@@ -1003,6 +1088,7 @@ export const AllSession = () => {
               <input
                 type="text"
                 placeholder="Search sessions..."
+                onChange={(e) => setQuery(e.target.value)}
                 className="pl-10 pr-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-500/50 transition-colors"
               />
             </div>
@@ -1027,7 +1113,7 @@ export const AllSession = () => {
                   className={`px-3 py-1 rounded-full text-xs font-medium ${
                     session?.status === "live"
                       ? "bg-red-600/20 text-red-300 border border-red-500/30"
-                      : session?.status === "upcoming"
+                      : session?.status === "pending"
                       ? "bg-yellow-600/20 text-yellow-300 border border-yellow-500/30"
                       : "bg-green-600/20 text-green-300 border border-green-500/30"
                   }`}
@@ -1082,20 +1168,19 @@ export const AllSession = () => {
               </div>
 
               <div className="flex gap-3">
-                {session?.status === "live" ? (
-                  <button className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-red-500/30">
-                    <div className="flex items-center justify-center gap-2">
-                      <Video size={18} />
-                      Join Now
-                    </div>
-                  </button>
-                ) : session.status === "upcoming" ? (
+                {session.status === "pending" ? (
                   <>
-                    <button className="flex-1 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 py-3 rounded-xl font-medium transition-all duration-300">
-                      View Details
+                    <button
+                      className="flex-1 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 py-3 rounded-xl font-medium transition-all duration-300"
+                      onClick={() => handleAccept(session)}
+                    >
+                      Accepts
                     </button>
-                    <button className="px-4 py-3 bg-red-600/20 hover:bg-red-600/30 rounded-xl text-red-300 transition-all duration-300">
-                      <Edit3 size={18} />
+                    <button
+                      className="px-4 py-3 bg-red-600/20 hover:bg-red-600/30 rounded-xl text-red-300 transition-all duration-300"
+                      onClick={() => handleCancel(session)}
+                    >
+                      Cancel
                     </button>
                   </>
                 ) : (

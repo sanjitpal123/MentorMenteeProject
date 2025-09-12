@@ -65,3 +65,12 @@ export const GetAllSessionRepo = async (userId) => {
     throw error;
   }
 };
+
+export const sessionSearchRepo = async (query) => {
+  try {
+    const res = await Session.find({ topic: { $regex: query, $options: "i" } });
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
