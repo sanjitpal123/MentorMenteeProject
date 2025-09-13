@@ -4,6 +4,7 @@ import {
   GetAllSessionRepo,
   GetASessionByIdRepo,
   RescheduleRepo,
+  SearchSessionByCategoryRepo,
   sessionSearchRepo,
   UpdateSessionByIdRepo,
 } from "../Repository/sessionRepo.js";
@@ -63,6 +64,15 @@ export const GetAllSessions = async (userid) => {
 export const sessionSearchService = async (query) => {
   try {
     const res = await sessionSearchRepo(query);
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const SearchSessionByCategoryService = async (userId, category) => {
+  try {
+    const res = await SearchSessionByCategoryRepo(userId, category);
     return res;
   } catch (error) {
     throw error;

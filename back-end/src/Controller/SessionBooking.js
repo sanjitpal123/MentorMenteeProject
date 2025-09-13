@@ -8,6 +8,7 @@ import {
   GetAllSessions,
   GetASessionByid,
   RescheduleService,
+  SearchSessionByCategoryService,
   sessionSearchService,
   UpdateSessionByIdService,
 } from "../Services/Session.Service.js";
@@ -230,6 +231,31 @@ export const searchSession = async (req, res) => {
     });
   } catch (error) {
     console.log("error to serach", error);
+    return res.status(501).json({
+      message: "Internal server error",
+      success: false,
+    });
+  }
+};
+
+export const SearchSessionByCategory = async (req, res) => {
+  try {
+    const { category } = req.body;
+    console.log("category", category);
+    const userId = req.user.userId;
+    const result = await SearchSessionByCategoryService(userId, category);
+    if (!result) {
+      return res.status(404).json({
+        message: "Can not find any session",
+        success: false,
+      });
+    }
+    return res.status(201).json({
+      result,
+      success: true,
+    });
+  } catch (error) {
+    console.log("error to search session by category", error);
     return res.status(501).json({
       message: "Internal server error",
       success: false,

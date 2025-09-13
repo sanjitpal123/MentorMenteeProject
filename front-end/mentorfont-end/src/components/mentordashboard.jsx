@@ -174,8 +174,11 @@ import {
 import {
   GetAllSessionSer,
   searchSession,
+  SearchSessionByCategorySer,
   UpdateStatus,
 } from "../services/Session";
+import NotFound from "./NotFoundCompo";
+import { useSearchParams } from "react-router-dom";
 
 // Exact colors (no Tailwind palette approximations)
 const COLORS = {
@@ -955,6 +958,8 @@ export const AllSession = () => {
   const { User } = useContext(GlobalContext);
   const wholeobject = JSON.parse(localStorage.getItem("user"));
   const [filterText, setFilterText] = useState("All");
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const GetAllSession = async () => {
     try {
       const res = await GetAllSessionSer(wholeobject.token);
@@ -978,7 +983,11 @@ export const AllSession = () => {
     try {
       const res = await searchSession(wholeobject.token, debouncingQuery);
       console.log("response to get all search session", res);
-      setSession(res.session);
+      if (Array.isArray(res.session) && res.session.length > 0) {
+        setSession(res.session);
+      } else {
+        setSession([]);
+      }
     } catch (error) {
       console.log("error to get session", error);
     }
@@ -986,6 +995,11 @@ export const AllSession = () => {
 
   useEffect(() => {
     searchSessions();
+    const params = {};
+    if (debouncingQuery) {
+      params.q = debouncingQuery;
+    }
+    setSearchParams(params);
   }, [debouncingQuery]);
   const handleCancel = async (session) => {
     try {
@@ -1013,10 +1027,19 @@ export const AllSession = () => {
       setFilterText(text);
     }
   }
-  function handleFilterByCategory() {
+  async function handleFilterByCategory() {
     try {
+      const result = await SearchSessionByCategorySer(wholeobject.token, {
+        category: filterText.toLowerCase(),
+      });
+      if (result.result.length > 0) {
+        setSession(result.result);
+      } else {
+        setSession([]);
+      }
+      console.log("result to get handle filter category  ", result);
     } catch (error) {
-      console.log("error", error);
+      console.log("error to filter by category ", error);
     }
   }
 
@@ -1037,6 +1060,15 @@ export const AllSession = () => {
       console.log("error to get update status of session", error);
     }
   }
+
+  useEffect(() => {
+    handleFilterByCategory();
+    const params = {};
+    if (filterText) {
+      params.category = filterText;
+    }
+    setSearchParams(params);
+  }, [filterText]);
 
   useEffect(() => {
     GetAllSession();
@@ -1101,102 +1133,115 @@ export const AllSession = () => {
 
       {/* Sessions Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {sessions?.map((session) => (
-          <div
-            key={session?.id}
-            className="group relative overflow-hidden bg-gradient-to-br from-gray-900/90 to-black/70 p-6 rounded-2xl border border-red-500/30 hover:border-red-400/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-red-500/25"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div className="relative z-10">
-              <div className="flex items-start justify-between mb-4">
-                <div
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    session?.status === "live"
-                      ? "bg-red-600/20 text-red-300 border border-red-500/30"
-                      : session?.status === "pending"
-                      ? "bg-yellow-600/20 text-yellow-300 border border-yellow-500/30"
-                      : "bg-green-600/20 text-green-300 border border-green-500/30"
-                  }`}
-                >
-                  {session?.status === "live" && (
-                    <div className="w-2 h-2 bg-red-400 rounded-full inline-block mr-2 animate-pulse"></div>
-                  )}
-                  {session?.status.toUpperCase()}
+        {sessions && sessions.length > 0 ? (
+          sessions?.map((session) => (
+            <div
+              key={session?.id}
+              className="group relative overflow-hidden bg-gradient-to-br from-gray-900/90 to-black/70 p-6 rounded-2xl border border-red-500/30 hover:border-red-400/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-red-500/25"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="relative z-10">
+                <div className="flex items-start justify-between mb-4">
+                  <div
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      session?.status === "live"
+                        ? "bg-red-600/20 text-red-300 border border-red-500/30"
+                        : session?.status === "pending"
+                        ? "bg-yellow-600/20 text-yellow-300 border border-yellow-500/30"
+                        : "bg-green-600/20 text-green-300 border border-green-500/30"
+                    }`}
+                  >
+                    {session?.status === "live" && (
+                      <div className="w-2 h-2 bg-red-400 rounded-full inline-block mr-2 animate-pulse"></div>
+                    )}
+                    {session?.status.toUpperCase()}
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="p-2 text-gray-400 hover:text-white hover:bg-red-600/20 rounded-lg transition-all duration-300">
+                      <Edit3 size={16} />
+                    </button>
+                    <button className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-600/20 rounded-lg transition-all duration-300">
+                      <MoreVertical size={16} />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <button className="p-2 text-gray-400 hover:text-white hover:bg-red-600/20 rounded-lg transition-all duration-300">
-                    <Edit3 size={16} />
-                  </button>
-                  <button className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-600/20 rounded-lg transition-all duration-300">
-                    <MoreVertical size={16} />
-                  </button>
-                </div>
-              </div>
 
-              <h3 className="text-xl font-bold text-white mb-2">
-                {session.topic}
-              </h3>
-              <p className="text-red-200 font-medium mb-4">
-                {session?.mentee?.name}
-              </p>
+                <h3 className="text-xl font-bold text-white mb-2">
+                  {session.topic}
+                </h3>
+                <p className="text-red-200 font-medium mb-4">
+                  {session?.mentee?.name}
+                </p>
 
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="flex items-center gap-2">
-                  <Calendar size={16} className="text-gray-400" />
-                  <span className="text-gray-300 text-sm">{session?.date}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock size={16} className="text-gray-400" />
-                  <span className="text-gray-300 text-sm">
-                    {new Date(session?.date).toLocaleTimeString()}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Activity size={16} className="text-gray-400" />
-                  <span className="text-gray-300 text-sm">
-                    {session?.duration}
-                  </span>
-                </div>
-                {session?.rating && (
+                <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="flex items-center gap-2">
-                    <Star size={16} className="text-yellow-400" />
-                    <span className="text-yellow-400 text-sm font-medium">
-                      {session?.rating}/5
+                    <Calendar size={16} className="text-gray-400" />
+                    <span className="text-gray-300 text-sm">
+                      {session?.date}
                     </span>
                   </div>
-                )}
-              </div>
+                  <div className="flex items-center gap-2">
+                    <Clock size={16} className="text-gray-400" />
+                    <span className="text-gray-300 text-sm">
+                      {new Date(session?.date).toLocaleTimeString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Activity size={16} className="text-gray-400" />
+                    <span className="text-gray-300 text-sm">
+                      {session?.duration}
+                    </span>
+                  </div>
+                  {session?.rating && (
+                    <div className="flex items-center gap-2">
+                      <Star size={16} className="text-yellow-400" />
+                      <span className="text-yellow-400 text-sm font-medium">
+                        {session?.rating}/5
+                      </span>
+                    </div>
+                  )}
+                </div>
 
-              <div className="flex gap-3">
-                {session.status === "pending" ? (
-                  <>
-                    <button
-                      className="flex-1 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 py-3 rounded-xl font-medium transition-all duration-300"
-                      onClick={() => handleAccept(session)}
-                    >
-                      Accepts
-                    </button>
-                    <button
-                      className="px-4 py-3 bg-red-600/20 hover:bg-red-600/30 rounded-xl text-red-300 transition-all duration-300"
-                      onClick={() => handleCancel(session)}
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button className="flex-1 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 py-3 rounded-xl font-medium transition-all duration-300">
-                      View Summary
-                    </button>
-                    <button className="px-4 py-3 bg-green-600/20 hover:bg-green-600/30 rounded-xl text-green-300 transition-all duration-300">
-                      <Download size={18} />
-                    </button>
-                  </>
-                )}
+                <div className="flex gap-3">
+                  {session.status === "pending" ? (
+                    <>
+                      <button
+                        className="flex-1 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 py-3 rounded-xl font-medium transition-all duration-300"
+                        onClick={() => handleAccept(session)}
+                      >
+                        Accepts
+                      </button>
+                      <button
+                        className="px-4 py-3 bg-red-600/20 hover:bg-red-600/30 rounded-xl text-red-300 transition-all duration-300"
+                        onClick={() => handleCancel(session)}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button className="flex-1 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 py-3 rounded-xl font-medium transition-all duration-300">
+                        View Summary
+                      </button>
+                      <button className="px-4 py-3 bg-green-600/20 hover:bg-green-600/30 rounded-xl text-green-300 transition-all duration-300">
+                        <Download size={18} />
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
+          ))
+        ) : (
+          <div className="col-span-full">
+            <NotFound
+              heading="Could Not Find Session"
+              text="The session you are searching for is not available. Please search for a valid session."
+              type="session"
+              fullPage={false} // 👈 makes it fit inside grid
+            />
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

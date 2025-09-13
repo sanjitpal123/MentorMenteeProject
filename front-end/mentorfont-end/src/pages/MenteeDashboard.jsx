@@ -770,6 +770,7 @@ const MenteeDashboard = () => {
                 { id: "sessions", label: "Sessions", icon: Video },
                 { id: "analytics", label: "Analytics", icon: BarChart3 },
                 { id: "community", label: "Community", icon: Users },
+                { id: "task", label: "Task", icon: BookOpen },
               ].map((tab) => {
                 const IconComponent = tab.icon;
                 return (

@@ -59,3 +59,16 @@ export const searchSession = async (token, query) => {
     throw error;
   }
 };
+
+export const SearchSessionByCategorySer = async (token, data) => {
+  try {
+    const res = await axiosInstance.post("/session/searchbycategory", data, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

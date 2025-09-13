@@ -74,3 +74,17 @@ export const sessionSearchRepo = async (query) => {
     throw error;
   }
 };
+
+export const SearchSessionByCategoryRepo = async (userId, category) => {
+  try {
+    console.log("userId", userId);
+    const result = await Session.find({
+      $or: [{ mentee: userId }, { mentor: userId }],
+      status: category,
+    });
+    console.log("result to get sessionby category in back-end", result);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};

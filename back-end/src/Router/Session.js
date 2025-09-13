@@ -6,6 +6,7 @@ import {
   GetASession,
   Reschedule,
   searchSession,
+  SearchSessionByCategory,
   UpdateASession,
 } from "../Controller/SessionBooking.js";
 import { Auth } from "../middleWear/Auth.js";
@@ -18,4 +19,5 @@ SessionRouter.post("/cancelled/:id", CancelledSessions);
 SessionRouter.post("/updatesession", Auth, UpdateASession);
 SessionRouter.get("/getallsession", Auth, GetAllSession);
 SessionRouter.post("/search", Auth, searchSession);
+SessionRouter.post("/searchbycategory", Auth, SearchSessionByCategory);
 export default SessionRouter;
