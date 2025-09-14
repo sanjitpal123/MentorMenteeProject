@@ -6,6 +6,7 @@ import {
   WelcomeMessage,
   MessagesFromMentee,
   AllSession,
+  TaskManagementOfMentorDashboard,
 } from "../components/mentordashboard";
 import {
   Home,
@@ -509,6 +510,10 @@ export default function MentorDashboard() {
       case "notification": {
         return <Notification />;
       }
+
+      case "task": {
+        return <TaskManagementOfMentorDashboard />;
+      }
       default:
         return <div className="text-white">Content for {activeTab}</div>;
     }
@@ -549,6 +554,8 @@ export default function MentorDashboard() {
               { id: "dashboard", icon: Home, label: "Dashboard" },
               { id: "notification", icon: Home, label: "Notification" },
               { id: "sessions", icon: Video, label: "Sessions" },
+              { id: "task", icon: BookOpen, label: "Task Management" },
+
               { id: "mentees", icon: Users, label: "Mentees" },
               { id: "messages", icon: MessageSquare, label: "Messages" },
               { id: "analytics", icon: BarChart3, label: "Analytics" },

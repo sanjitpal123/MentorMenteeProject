@@ -96,3 +96,14 @@ export const GetMentorByIdRepo = async (MentorId, MenteeId) => {
     throw error;
   }
 };
+
+export const GetMentorByIdReposite = async (MentorId) => {
+  try {
+    const res = await User.findById(MentorId)
+      .populate("mentees")
+      .select("-password");
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};

@@ -1,8 +1,10 @@
+import message from "../Model/Message.js";
 import {
   FilterMentorsByLowToHighService,
   FilterMentorService,
   GetAllMentorsService,
   GetMentorById,
+  GetMentorProfileService,
 } from "../Services/Mentor.js";
 
 export const GetAllMentos = async (req, res) => {
@@ -105,6 +107,29 @@ export const GetMentorByIdCon = async (req, res) => {
     return res.status(501).json({
       message: "Internal server error",
       success: false,
+    });
+  }
+};
+
+export const GetMentorProfile = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const result = await GetMentorProfileService(id);
+    if (!result) {
+      return res.status(404).json({
+        message: "Can not get mentor Profile",
+        success: false,
+      });
+    }
+    return res.status(201).json({
+      success: true,
+      result,
+    });
+  } catch (error) {
+    console.log("error to get mentor profile", error);
+    return res.status(501).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 };

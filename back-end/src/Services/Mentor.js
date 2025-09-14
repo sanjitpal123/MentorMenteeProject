@@ -4,6 +4,7 @@ import {
   GetAllMentorRepo,
   GetMentorByIdRepo,
   SearchMentorRepo,
+  GetMentorByIdReposite,
 } from "../Repository/Mentor.js";
 
 export const SearchMentorService = async (query) => {
@@ -46,6 +47,15 @@ export const GetMentorById = async (MentorId, MenteeId) => {
   try {
     const mentor = await GetMentorByIdRepo(MentorId, MenteeId);
     return mentor;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const GetMentorProfileService = async (MentorId) => {
+  try {
+    const res = await GetMentorByIdReposite(MentorId);
+    return res;
   } catch (error) {
     throw error;
   }

@@ -6,7 +6,9 @@ import {
   FilterPriceLowToHigh,
   GetAllMentos,
   GetMentorByIdCon,
+  GetMentorProfile,
 } from "../Controller/Mentor.js";
+import { Auth } from "../middleWear/Auth.js";
 
 const MentorRouter = express.Router();
 
@@ -20,6 +22,7 @@ MentorRouter.get("/ping", (req, res) => {
 MentorRouter.get("/allmentor", GetAllMentos);
 MentorRouter.post("/filtermentor", FilterMentor);
 MentorRouter.get("/lowtohigh", FilterPriceLowToHigh);
+MentorRouter.post("/getmentorprofile", GetMentorProfile);
 MentorRouter.post("/getmentorbyid", GetMentorByIdCon);
 
 export default MentorRouter;
