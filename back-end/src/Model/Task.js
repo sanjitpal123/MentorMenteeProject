@@ -1,5 +1,25 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
+const questionsSchema = new mongoose.Schema({
+  question: {
+    type: String,
+  },
+  choice1: {
+    type: String,
+  },
+  choice2: {
+    type: String,
+  },
+  choice3: {
+    type: String,
+  },
+  choice4: {
+    type: String,
+  },
+  answer: {
+    type: String,
+  },
+});
 const TaskSchema = new mongoose.Schema({
   Title: {
     type: String,
@@ -9,9 +29,18 @@ const TaskSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  Date: {
+  Duedate: {
     type: Date,
     required: true,
   },
-  questions: [{ type: mongoose.Schema.Types.ObjectId, ref: "taskquestions" }],
+  CreatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+  Questions: [questionsSchema],
+  Mentees: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
+
+const Task = mongoose.model("Task", TaskSchema);
+
+export default Task;

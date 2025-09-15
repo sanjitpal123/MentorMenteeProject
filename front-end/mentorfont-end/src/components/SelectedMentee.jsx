@@ -4,8 +4,8 @@ import { Plus, Send, Users } from "lucide-react";
 import { GetMentorProfile } from "../services/MentorProfile";
 
 function MenteeListedInTaskMangementOfMentorDashboard() {
-  const [selectedMentees, setselectedMentees] = useState([]);
-  const { User } = useContext(GlobalContext);
+  const { User, setselectedMentees, selectedMentees } =
+    useContext(GlobalContext);
   const user = JSON.parse(localStorage.getItem("user"));
   const [mentees, setMentees] = useState([]);
 

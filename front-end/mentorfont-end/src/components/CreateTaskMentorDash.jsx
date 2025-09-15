@@ -2,7 +2,13 @@ import { Plus, Send, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import FetchAllMentee from "../services/GetAllMentee";
 import MenteeListedInTaskMangementOfMentorDashboard from "./SelectedMentee";
+import { useContext } from "react";
+import { GlobalContext } from "../ContextApiStore/ContextStore";
+import { CreateTaskSer } from "../services/Task";
 function CreateTask() {
+  const { setselectedMentees, selectedMentees, User } =
+    useContext(GlobalContext);
+  const user = JSON.parse(localStorage.getItem("user"));
   const [questions, setQuestions] = useState([]);
   const [question, setQuestion] = useState("");
   const [choice1, setChoice1] = useState("");
@@ -10,6 +16,17 @@ function CreateTask() {
   const [choice3, setChoice3] = useState("");
   const [choice4, setchoice4] = useState("");
   const [answer, setAnswer] = useState("");
+  const [FormData, setFormData] = useState({
+    Title: "",
+    Description: "",
+    Duedate: "",
+    Questions: [],
+    Mentees: [],
+  });
+
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, Mentees: selectedMentees }));
+  }, [selectedMentees]);
 
   function handleAddQuestion() {
     const data = {
@@ -24,6 +41,19 @@ function CreateTask() {
     setQuestions((prev) => [...prev, data]);
     console.log("click");
   }
+  async function handleTaskToMentee() {
+    console.log("formdata", FormData);
+    try {
+      const res = await CreateTaskSer(FormData, user.token);
+      console.log("response to create task", res);
+    } catch (error) {
+      console.log("error to create task", error);
+    }
+  }
+
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, Questions: questions }));
+  }, [questions]);
 
   useEffect(() => {
     console.log("questionds", questions);
@@ -45,10 +75,10 @@ function CreateTask() {
               </label>
               <input
                 type="text"
-                // value={taskForm.title}
-                // onChange={(e) =>
-                //   setTaskForm({ ...taskForm, title: e.target.value })
-                // }
+                value={FormData.Title}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, Title: e.target.value }))
+                }
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 placeholder="Enter task title..."
               />
@@ -59,13 +89,13 @@ function CreateTask() {
                 Description
               </label>
               <textarea
-                // value={taskForm.description}
-                // onChange={(e) =>
-                //   setTaskForm({
-                //     ...taskForm,
-                //     description: e.target.value,
-                //   })
-                // }
+                value={FormData.Description}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    Description: e.target.value,
+                  }))
+                }
                 rows={4}
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
                 placeholder="Describe the task in detail..."
@@ -79,10 +109,13 @@ function CreateTask() {
                 </label>
                 <input
                   type="date"
-                  //   value={taskForm.dueDate}
-                  //   onChange={(e) =>
-                  //     setTaskForm({ ...taskForm, dueDate: e.target.value })
-                  //   }
+                  value={FormData.Duedate}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      Duedate: e.target.value,
+                    }))
+                  }
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 />
               </div>
@@ -223,7 +256,10 @@ function CreateTask() {
                 ))}
             </div>
 
-            <button className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
+            <button
+              onClick={handleTaskToMentee}
+              className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center"
+            >
               <Send className="w-5 h-5 mr-2" />
               Assign Task to Selected Mentees
             </button>

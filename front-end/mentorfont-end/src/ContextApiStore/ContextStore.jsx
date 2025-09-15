@@ -8,6 +8,8 @@ export const GlobalContext = createContext();
 export const GlobalContextProvider = ({ children }) => {
   const [mentorCount, setMentorCount] = useState(0);
   const [menteeCount, setMenteeCount] = useState(0);
+  const [selectedMentees, setselectedMentees] = useState([]);
+
   const [filterMentors, setFilterMentors] = useState([]);
   const [pages, Setpages] = useState(1);
   const [User, setUser] = useState();
@@ -58,6 +60,8 @@ export const GlobalContextProvider = ({ children }) => {
         GetMenteeProfile,
         Suser,
         setSUser,
+        selectedMentees,
+        setselectedMentees,
       }}
     >
       {children}
