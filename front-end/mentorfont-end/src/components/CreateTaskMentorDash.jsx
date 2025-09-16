@@ -5,6 +5,7 @@ import MenteeListedInTaskMangementOfMentorDashboard from "./SelectedMentee";
 import { useContext } from "react";
 import { GlobalContext } from "../ContextApiStore/ContextStore";
 import { CreateTaskSer } from "../services/Task";
+import { socket } from "../utils/socket";
 function CreateTask() {
   const { setselectedMentees, selectedMentees, User } =
     useContext(GlobalContext);
@@ -46,6 +47,7 @@ function CreateTask() {
     try {
       const res = await CreateTaskSer(FormData, user.token);
       console.log("response to create task", res);
+      socket.emit("NotifyAboutTask", { receiverIds: FormData.Mentees });
     } catch (error) {
       console.log("error to create task", error);
     }

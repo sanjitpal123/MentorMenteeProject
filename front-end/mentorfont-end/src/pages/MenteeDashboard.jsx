@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   User,
   Target,
@@ -121,12 +121,16 @@ import {
 } from "recharts";
 import { Link } from "react-router-dom";
 import { socket } from "../utils/socket";
+import { GlobalContext } from "../ContextApiStore/ContextStore";
+import { toast } from "react-toastify";
 const MenteeDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [currentTime, setCurrentTime] = useState(new Date());
   const [notifications, setNotifications] = useState(3);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGoal, setSelectedGoal] = useState(null);
+  const { User } = useContext(GlobalContext);
+  const user = JSON.parse(localStorage.getItem("user"));
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
 
   // Placeholder functions for future implementation
@@ -148,22 +152,56 @@ const MenteeDashboard = () => {
   const handleCodeReviewAI = () => console.log("AI Code Review feature");
 
   useEffect(() => {
+    if (!user?._id) return;
+
+    // join room using menteeId
+    socket.emit("join", user._id);
+
     const handleStatusUpdate = () => {
-      console.log("status is updated from mentor");
+      console.log("✅ Status update received from mentor");
+      toast.dismiss();
+      toast.info("New Session Has Been Created");
     };
 
-    // attach socket listener
+    const handleTaskNotification = () => {
+      toast.dismiss();
+
+      toast.info("Task notification received");
+    };
+
     socket.on("StatusUpdateOfSession", handleStatusUpdate);
+    socket.on("NotifyingAboutTask", handleTaskNotification);
 
-    // start timer
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-
-    // cleanup both socket listener & timer
     return () => {
       socket.off("StatusUpdateOfSession", handleStatusUpdate);
-      clearInterval(timer);
+      socket.off("NotifyingAboutTask", handleTaskNotification);
     };
-  }, []);
+  }, [user?._id]);
+
+  // useEffect(() => {
+  //   const handleStatusUpdate = () => {
+  //     console.log("status is updated from mentor");
+  //   };
+  //   const handleTaskNotification = () => {
+  //     console.log("status is updated from mentor");
+  //   };
+
+  //   // attach socket listener
+  //   socket.on("StatusUpdateOfSession", handleStatusUpdate);
+
+  //   // listen for task
+  //   socket.on("NotifyingAboutTask", handleTaskNotification);
+
+  //   // start timer
+  //   const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+
+  //   // cleanup both socket listener & timer
+  //   return () => {
+  //     socket.off("StatusUpdateOfSession", handleStatusUpdate);
+  //     socket.off("NotifyingAboutTask", handleTaskNotification);
+  //     clearInterval(timer);
+  //   };
+  // }, [socket]);
 
   useEffect(() => {
     const handleNotification = () => {

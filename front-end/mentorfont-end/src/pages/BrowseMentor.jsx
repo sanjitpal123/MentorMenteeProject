@@ -26,7 +26,7 @@ import { TextPlugin } from "gsap/TextPlugin";
 import WishListSer from "../services/AddToWishList";
 import { Link, useNavigate } from "react-router-dom";
 import { CreateConvo } from "../services/Convo";
-
+import { socket } from "../utils/socket";
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
@@ -233,6 +233,29 @@ function BrowseMentor() {
       navigate(`/chat/${error.response.data.existed._id}`);
     }
   }
+
+  useEffect(() => {
+    const handleStatusUpdate = () => {
+      console.log("status is updated from mentor");
+    };
+    const handleTaskNotification = () => {
+      console.log("status is updated from mentor");
+    };
+
+    // attach socket listener
+    socket.on("StatusUpdateOfSession", handleStatusUpdate);
+
+    // listen for task
+    socket.on("NotifyingAboutTask", handleTaskNotification);
+
+    // start timer
+
+    // cleanup both socket listener & timer
+    return () => {
+      socket.off("StatusUpdateOfSession", handleStatusUpdate);
+      socket.off("NotifyingAboutTask", handleTaskNotification);
+    };
+  }, [socket]);
 
   useEffect(() => {
     GetMenteeProfile();

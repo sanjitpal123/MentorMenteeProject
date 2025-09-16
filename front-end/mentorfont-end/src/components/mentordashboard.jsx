@@ -164,6 +164,7 @@ import { useSearchParams } from "react-router-dom";
 import CreateTask from "./CreateTaskMentorDash";
 import ManageTask from "./ManageTask";
 import MenteeTaskOverView from "./MenteeTaskoverview";
+import MenteeTaskOverViewForMentorDashBoard from "./MenteeTaskoverview";
 
 // Exact colors (no Tailwind palette approximations)
 const COLORS = {
@@ -1512,7 +1513,7 @@ export const TaskManagementOfMentorDashboard = () => {
         {activeTab === "manage" && <ManageTask />}
 
         {/* Mentees Overview Tab */}
-        {activeTab === "mentees" && <MenteeTaskOverView />}
+        {activeTab === "mentees" && <MenteeTaskOverViewForMentorDashBoard />}
       </div>
     </div>
   );

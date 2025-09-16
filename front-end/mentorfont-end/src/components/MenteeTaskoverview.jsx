@@ -1,4 +1,4 @@
-function MenteeTaskOverView() {
+function MenteeTaskOverViewForMentorDashBoard() {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
@@ -74,4 +74,4 @@ function MenteeTaskOverView() {
     </div>
   );
 }
-export default MenteeTaskOverView;
+export default MenteeTaskOverViewForMentorDashBoard;
