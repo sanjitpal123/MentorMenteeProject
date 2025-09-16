@@ -69,9 +69,15 @@ export const SocketServer = (socket, io) => {
 
   socket.on("NotifySessionStatusUpdate", ({ receiverId }) => {
     console.log("Notifying mentee about session status", receiverId);
-    io.to(receiverId).emit("StatusUpdateOfSession");
+    io.to(String(receiverId)).emit("StatusUpdateOfSession");
   });
 
+  socket.on("NotifyAboutTask", ({ receiverIds }) => {
+    console.log("ids", receiverIds);
+    receiverIds.forEach((id) =>
+      io.to(id.toString()).emit("NotifyingAboutTask")
+    );
+  });
   // for offline user
 
   socket.on("disconnect", () => {
