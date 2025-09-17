@@ -25,6 +25,7 @@ import MentorDashboard from "./pages/MentorDashboard";
 import AiDoubtSolver from "./pages/AiDoubtSolver";
 import MenteeDashboard from "./pages/MenteeDashboard";
 import ScheduleSession from "./pages/ScheduleSessionPage";
+import TaskAttendPage from "./pages/TaskAtttendPage";
 
 function App() {
   const { setUser, User } = useContext(GlobalContext);
@@ -67,6 +68,7 @@ function App() {
             />
             <Route path="mentee/dashboard" element={<MenteeDashboard />} />
             <Route path="/createsession" element={<ScheduleSession />} />
+            <Route path="/attendtask/:id" element={<TaskAttendPage />} />
           </Route>
         </Routes>
       </Router>

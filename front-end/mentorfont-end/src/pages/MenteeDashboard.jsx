@@ -123,6 +123,7 @@ import { Link } from "react-router-dom";
 import { socket } from "../utils/socket";
 import { GlobalContext } from "../ContextApiStore/ContextStore";
 import { toast } from "react-toastify";
+import { Task } from "../components/MenteeDashBoard";
 const MenteeDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -1765,6 +1766,7 @@ const MenteeDashboard = () => {
               </div>
             </div>
           )}
+          {activeTab === "task" && <Task />}
         </div>
 
         {/* Floating Action Button */}
