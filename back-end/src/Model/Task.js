@@ -33,6 +33,7 @@ const TaskSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  AttendedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   CreatedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

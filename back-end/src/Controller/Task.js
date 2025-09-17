@@ -1,6 +1,7 @@
 import message from "../Model/Message.js";
 import {
   CreateTaskService,
+  GetATaskByIdService,
   GetTaskForASpecificUserService,
 } from "../Services/Task.js";
 
@@ -40,8 +41,9 @@ export const createTask = async (req, res) => {
 
 export const GetAllTaskOfASpecificUser = async (req, res) => {
   try {
-    const userId = req.user.userId;
-    const result = await GetTaskForASpecificUserService(userId);
+    const userid = req.user.userId;
+    console.log("user id to get message", userid);
+    const result = await GetTaskForASpecificUserService(userid);
     if (!result) {
       return res.status(404).json({
         message: "Could not get task",
@@ -53,6 +55,25 @@ export const GetAllTaskOfASpecificUser = async (req, res) => {
     console.log("error to get all task", error);
     return res.status(501).json({
       message: "Internal Server Error",
+      success: false,
+    });
+  }
+};
+export const GetTaskById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log("id to get task", id);
+    const result = await GetATaskByIdService(id);
+    if (!result) {
+      return res.status(404).json({
+        message: "Can not find any task",
+        success: false,
+      });
+    }
+    return res.status(201).json(result);
+  } catch (error) {
+    return req.status(501).json({
+      message: "Internal server error",
       success: false,
     });
   }

@@ -1,5 +1,6 @@
 import {
   CreateTaskRepo,
+  GetATaskByIdRepo,
   GetTaskForASpecificUserRepo,
 } from "../Repository/Task.js";
 
@@ -15,6 +16,14 @@ export const CreateTaskService = async (obj) => {
 export const GetTaskForASpecificUserService = async (userId) => {
   try {
     const res = await GetTaskForASpecificUserRepo(userId);
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+export const GetATaskByIdService = async (id) => {
+  try {
+    const res = await GetATaskByIdRepo(id);
     return res;
   } catch (error) {
     throw error;

@@ -19,3 +19,13 @@ export const GetTaskForASpecificUserRepo = async (userId) => {
     throw error;
   }
 };
+
+export const GetATaskByIdRepo = async (id) => {
+  try {
+    const result = await Task.findById(id);
+    console.log("result in repo", result);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
