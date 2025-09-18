@@ -16,7 +16,7 @@ function CreateTask() {
   const [choice2, setChoice2] = useState("");
   const [choice3, setChoice3] = useState("");
   const [choice4, setchoice4] = useState("");
-  const [answer, setAnswer] = useState("");
+  const [answer, setAnswer] = useState(choice1);
   const [FormData, setFormData] = useState({
     Title: "",
     Description: "",
@@ -52,6 +52,9 @@ function CreateTask() {
       console.log("error to create task", error);
     }
   }
+  useEffect(() => {
+    console.log("answer", answer);
+  }, [answer]);
 
   useEffect(() => {
     setFormData((prev) => ({ ...prev, Questions: questions }));
@@ -220,7 +223,7 @@ function CreateTask() {
                   <label>Choose Answer</label>
                   <select
                     value={answer ? answer : "Choose"}
-                    onSelect={(e) => setAnswer(e.target.value)}
+                    onChange={(e) => setAnswer(e.target.value)}
                     className="w-full bg-black border border-red-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   >
                     <option>{choice1} </option>
