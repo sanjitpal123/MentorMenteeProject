@@ -12,6 +12,7 @@ function TaskAttendPage() {
   const navigator = useNavigate();
   const [correctedAnswer, setCorrectedAnswer] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [attendedQuestion, setAttendedQuestion] = useState([]);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -33,15 +34,19 @@ function TaskAttendPage() {
   }
 
   function handleSubmit() {
-    setIsSubmitting(true);
-    setTimeout(() => {
-      navigator("/result", {
-        state: {
-          total: Task.Questions.length,
-          correct: correctedAnswer,
-        },
-      });
-    }, 1000);
+    try {
+      setIsSubmitting(true);
+      setTimeout(() => {
+        navigator("/result", {
+          state: {
+            total: Task.Questions.length,
+            correct: correctedAnswer,
+          },
+        });
+      }, 1000);
+    } catch (error) {
+      console.log("error to handle submit");
+    }
   }
 
   function handleAnswering(question, selectedanswer, questionIndex) {
@@ -50,6 +55,7 @@ function TaskAttendPage() {
     const previousAnswer = newAnswers[questionIndex];
     newAnswers[questionIndex] = selectedanswer;
     setAnswers(newAnswers);
+    setAttendedQuestion((prev) => [...prev, questionIndex]);
 
     // Update correct answer count
     if (previousAnswer && previousAnswer === question.answer) {
@@ -63,19 +69,6 @@ function TaskAttendPage() {
   useEffect(() => {
     GetATask();
   }, [id]);
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  };
-
-  const getProgressPercentage = () => {
-    const answered = Object.keys(answers).length;
-    return (answered / (Task?.Questions.length || 1)) * 100;
-  };
 
   if (!Task) {
     return (
@@ -106,7 +99,7 @@ function TaskAttendPage() {
             <div className="bg-gray-700 rounded-lg px-4 py-2 flex items-center space-x-2">
               <Timer className="w-5 h-5 text-red-400" />
               <span className="text-white font-mono text-lg">
-                {formatTime(timeElapsed)}
+                {/* {formatTime(timeElapsed)} */}
               </span>
             </div>
             <div className="bg-gray-700 rounded-lg px-4 py-2 flex items-center space-x-2">
@@ -119,7 +112,7 @@ function TaskAttendPage() {
         </div>
 
         {/* Progress Bar */}
-        <div className="bg-gray-700 rounded-lg p-4">
+        {/* <div className="bg-gray-700 rounded-lg p-4">
           <div className="flex justify-between items-center mb-2">
             <span className="text-gray-300">Progress</span>
             <span className="text-red-400 font-semibold">
@@ -132,7 +125,7 @@ function TaskAttendPage() {
               style={{ width: `${getProgressPercentage()}%` }}
             ></div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className="flex w-full gap-8 p-8">
@@ -244,23 +237,38 @@ function TaskAttendPage() {
               <h2 className="text-xl font-bold text-white">Navigation</h2>
             </div>
 
-            {/* Stats */}
-            <div className="mb-6 p-4 bg-gray-700 rounded-lg">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-300 text-sm">Answered</span>
-                <span className="text-red-400 font-semibold">
-                  {Object.keys(answers).length}/{Task.Questions.length}
-                </span>
-              </div>
-              <div className="w-full bg-gray-600 h-2 rounded-full">
+            <div className="flex flex-wrap gap-5 justify-start ">
+              {Task.Questions.map((q, index) => (
                 <div
-                  className="bg-red-500 h-full transition-all duration-500 rounded-full"
-                  style={{ width: `${getProgressPercentage()}%` }}
-                ></div>
-              </div>
+                  className={`${
+                    attendedQuestion.includes(index)
+                      ? "bg-red-900"
+                      : "bg-gray-900"
+                  } py-2 px-4  text-white rounded-full`}
+                >
+                  {index}
+                </div>
+              ))}
             </div>
+            {/* Stats */}
+            {/*
+              <div className="mb-6 p-4 bg-gray-700 rounded-lg">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-300 text-sm">Answered</span>
+                  <span className="text-red-400 font-semibold">
+                    {Object.keys(answers).length}/{Task.Questions.length}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-600 h-2 rounded-full">
+                  <div
+                    className="bg-red-500 h-full transition-all duration-500 rounded-full"
+                    style={{ width: `${getProgressPercentage()}%` }}
+                  ></div>
+                </div>
+              </div>
+            */}
 
-            <div className="grid grid-cols-5 gap-3">
+            {/*<div className="grid grid-cols-5 gap-3">
               {Task.Questions.map((_, index) => {
                 const isAnswered = answers[index] !== undefined;
 
@@ -290,10 +298,10 @@ function TaskAttendPage() {
                   </div>
                 );
               })}
-            </div>
+            </div>*/}
           </div>
 
-          {/* Performance Stats */}
+          {/* Performance 
           <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
             <h2 className="text-xl font-bold text-white mb-4">Stats</h2>
 
@@ -320,6 +328,7 @@ function TaskAttendPage() {
               </div>
             </div>
           </div>
+          Stats */}
         </div>
       </div>
     </div>
