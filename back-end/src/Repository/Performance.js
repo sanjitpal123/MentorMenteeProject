@@ -8,3 +8,25 @@ export const CreatePerformanceRepo = async (data) => {
     throw error;
   }
 };
+
+export const CheckIsExisted = async (mentee, task) => {
+  try {
+    const isExisted = await Performance.findOne({ mentee, task });
+    return isExisted; // null if not found, doc if found
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const UpdateScore = async (taskid, data) => {
+  try {
+    const res = await Performance.findByIdAndUpdate(
+      taskid,
+      { $set: data },
+      { new: true }
+    );
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};

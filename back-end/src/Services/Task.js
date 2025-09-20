@@ -2,6 +2,7 @@ import {
   CreateTaskRepo,
   GetATaskByIdRepo,
   GetTaskForASpecificUserRepo,
+  whoAttendRepo,
 } from "../Repository/Task.js";
 
 export const CreateTaskService = async (obj) => {
@@ -24,6 +25,15 @@ export const GetTaskForASpecificUserService = async (userId) => {
 export const GetATaskByIdService = async (id) => {
   try {
     const res = await GetATaskByIdRepo(id);
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const AttendedByService = async (id, mentee) => {
+  try {
+    const res = await whoAttendRepo(id, mentee);
     return res;
   } catch (error) {
     throw error;

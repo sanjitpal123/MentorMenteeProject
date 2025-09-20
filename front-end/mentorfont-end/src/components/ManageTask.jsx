@@ -1,11 +1,31 @@
+import { GlobalContext } from "../ContextApiStore/ContextStore";
+import { getTask } from "../services/Task";
+import { useContext, useEffect, useState } from "react";
+import { Calendar } from "lucide-react";
 function ManageTask() {
+  const { User } = useContext(GlobalContext);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const [tasks, setTasks] = useState([]);
+  async function GetAllTask() {
+    try {
+      const res = await getTask(user.token);
+      console.log("response to get task", res);
+      setTasks(res);
+    } catch (error) {
+      console.log("error to get task", error);
+    }
+  }
+  useEffect(() => {
+    GetAllTask();
+    console.log("task", tasks);
+  }, []);
   return (
     <div className="space-y-6">
       {/* Search and Filter */}
       <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+            ?{" "}
             <input
               type="text"
               placeholder="Search tasks..."
@@ -31,23 +51,30 @@ function ManageTask() {
 
       {/* Tasks Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tasks.map((task) => (
+        {tasks?.map((task) => (
           <div
             key={task.id}
             className="bg-gray-900 rounded-xl border border-gray-800 p-6 hover:border-gray-700 transition-colors"
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-2">
-                {getStatusIcon(task.status)}
+                {/* {getStatusIcon(task.status)} */}
                 <span className="text-sm text-gray-400">{task.status}</span>
               </div>
-              <span
+              {/* <span
                 className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(
                   task.priority
                 )}`}
               >
                 {task.priority}
-              </span>
+              </span> */}
+              {/* <span
+                className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(
+                  task.priority
+                )}`}
+              >
+                {task.priority}
+              </span> */}
             </div>
 
             <h3 className="text-lg font-bold text-white mb-2">{task.title}</h3>
@@ -62,7 +89,7 @@ function ManageTask() {
               </div>
               <span className="bg-gray-800 px-2 py-1 rounded">{task.type}</span>
             </div>
-
+            {/* 
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-400">Assigned to:</span>
               <div className="flex -space-x-1">
@@ -83,9 +110,9 @@ function ManageTask() {
                   </div>
                 )}
               </div>
-            </div>
+            </div> */}
 
-            {task.questions && task.questions.length > 0 && (
+            {/* {task.questions && task.questions.length > 0 && (
               <div className="mt-4 pt-4 border-t border-gray-800">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
@@ -101,7 +128,7 @@ function ManageTask() {
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         ))}
       </div>

@@ -1,25 +1,57 @@
-import message from "../Model/Message";
-import { CreatePerformanceService } from "../Services/Performance";
+import {
+  CreatePerformanceService,
+  isCheckedExistedScoreService,
+  updatedScoreService,
+} from "../Services/Performance.js";
 
 export const createPerformance = async (req, res) => {
   try {
-    const { totalQuestion, score, mentee, task } = req.body;
-    const CreatePerformance = await CreatePerformanceService({
-      totalQuestion,
-      score,
-      mentee,
-      task,
-    });
-    if (!createPerformance) {
-      return res.status(403).json({
-        message: "Can not create performance",
-        success: false,
+    const { totalquestion, correctanswer, wronganswer, score, mentee, task } =
+      req.body;
+
+    // check if present mentee id and task id so update
+    const isExisted = await isCheckedExistedScoreService(mentee, task);
+    console.log("isexited", isExisted);
+    if (isExisted) {
+      const result = await updatedScoreService(isExisted._id, {
+        totalquestion,
+        score,
+        mentee,
+        correctanswer,
+        wronganswer,
+        task,
+      });
+      if (result) {
+        return res.status(201).json({
+          message: "score is updated successfully",
+          result,
+        });
+      } else {
+        return res.status(403).json({
+          message: "Can not update successfully ",
+          success: false,
+        });
+      }
+    } else {
+      const CreatePerformance = await CreatePerformanceService({
+        totalquestion,
+        score,
+        mentee,
+        correctanswer,
+        wronganswer,
+        task,
+      });
+      if (!createPerformance) {
+        return res.status(403).json({
+          message: "Can not create performance",
+          success: false,
+        });
+      }
+      return res.status(201).json({
+        message: "Create performance successfully",
+        CreatePerformance,
       });
     }
-    return res.status(201).json({
-      message: "Create performance successfully",
-      CreatePerformance,
-    });
   } catch (error) {
     console.log("error to create performance", error);
     return res.status(501).json({

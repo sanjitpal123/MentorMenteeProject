@@ -1,8 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { GetTaskById } from "../services/Task";
+import { Attended, GetTaskById } from "../services/Task";
 import { GlobalContext } from "../ContextApiStore/ContextStore";
 import { Clock, CheckCircle, Trophy, Target, Timer, Award } from "lucide-react";
+import { StoreScore } from "../services/Performance";
 
 function TaskAttendPage() {
   const { id } = useParams();
@@ -33,19 +34,34 @@ function TaskAttendPage() {
     }
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     try {
       setIsSubmitting(true);
-      setTimeout(() => {
-        navigator("/result", {
-          state: {
-            total: Task.Questions.length,
-            correct: correctedAnswer,
-          },
-        });
-      }, 1000);
+
+      const Attenedby = await Attended(user.token, {
+        task_id: id,
+        AttendedBy: user._id,
+      });
+      console.log("responsive to store attend ", Attenedby);
+      const result = await StoreScore(user.token, {
+        totalquestion: Task.Questions.length,
+        score: ((correctedAnswer / Task.Questions.length) * 100).toFixed(2),
+        mentee: user._id,
+        correctanswer: correctedAnswer,
+        wronganswer: Task.Questions.length - correctedAnswer,
+        task: id,
+      });
+      console.log("response to score performance", result);
+      navigator("/result", {
+        state: {
+          total: Task.Questions.length,
+          correct: correctedAnswer,
+        },
+      });
     } catch (error) {
-      console.log("error to handle submit");
+      setIsSubmitting(false);
+
+      console.log("error to store score", error);
     }
   }
 

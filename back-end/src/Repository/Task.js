@@ -29,3 +29,15 @@ export const GetATaskByIdRepo = async (id) => {
     throw error;
   }
 };
+export const whoAttendRepo = async (id, mentee) => {
+  try {
+    const result = await Task.findByIdAndUpdate(
+      id,
+      { $addToSet: { AttendedBy: mentee } },
+      { new: true }
+    );
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};

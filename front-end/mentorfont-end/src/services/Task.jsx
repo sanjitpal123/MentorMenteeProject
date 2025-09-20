@@ -38,3 +38,15 @@ export const GetTaskById = async (token, id) => {
     throw error;
   }
 };
+export const Attended = async (token, obj) => {
+  try {
+    const res = await axiosInstance.put("/task/attend", obj, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

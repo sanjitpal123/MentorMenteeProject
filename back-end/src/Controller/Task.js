@@ -1,5 +1,6 @@
 import message from "../Model/Message.js";
 import {
+  AttendedByService,
   CreateTaskService,
   GetATaskByIdService,
   GetTaskForASpecificUserService,
@@ -75,6 +76,35 @@ export const GetTaskById = async (req, res) => {
     return req.status(501).json({
       message: "Internal server error",
       success: false,
+    });
+  }
+};
+
+export const AttendedBy = async (req, res) => {
+  try {
+    const { task_id, AttendedBy } = req.body;
+    if (!task_id || !AttendedBy) {
+      return res.status(403).json({
+        message: "please fill all the field ",
+        success: false,
+      });
+    }
+    const updated = await AttendedByService(task_id, AttendedBy);
+    if (!updated) {
+      return res.status(403).json({
+        message: "Could not update",
+        success: false,
+      });
+    }
+    return res.status(201).json({
+      success: true,
+      message: "updated successfully",
+      updated,
+    });
+  } catch (error) {
+    return res.status(501).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 };

@@ -2,17 +2,26 @@ import mongoose from "mongoose";
 
 const PerformanceSchema = new mongoose.Schema(
   {
-    totalQuestion: {
+    totalquestion: {
       type: Number,
       required: true,
     },
-    score: {
+    correctanswer: {
       type: Number,
       required: true,
     },
     mentee: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
+    },
+    wronganswer: {
+      type: Number,
+      required: true,
+    },
+
+    score: {
+      type: String,
       required: true,
     },
     task: {
