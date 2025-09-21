@@ -14,6 +14,7 @@ export const GlobalContextProvider = ({ children }) => {
   const [pages, Setpages] = useState(1);
   const [User, setUser] = useState();
   const [Suser, setSUser] = useState();
+  const [Performance, setPerformance] = useState("");
 
   // Load user from localStorage on first render
   useEffect(() => {
@@ -56,6 +57,8 @@ export const GlobalContextProvider = ({ children }) => {
         Setpages,
         pages,
         User,
+        Performance,
+        setPerformance,
         setUser,
         GetMenteeProfile,
         Suser,

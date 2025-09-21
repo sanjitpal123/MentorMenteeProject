@@ -21,7 +21,7 @@ export const StoreScore = async (token, obj) => {
 
 export const GetPerformanceOfMentee = async (token, obj) => {
   try {
-    const res = await axiosInstance.get("/task/getperformance", obj, {
+    const res = await axiosInstance.post("/task/getperformance", obj, {
       headers: {
         authorization: `Bearer ${token}`, // <-- Make sure A is capital
       },

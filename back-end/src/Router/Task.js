@@ -13,5 +13,5 @@ TaskRouter.post("/create", Auth, createTask);
 TaskRouter.get("/gettask", Auth, GetAllTaskOfASpecificUser);
 TaskRouter.get("/getbyid/:id", Auth, GetTaskById);
 TaskRouter.put("/attend", Auth, AttendedBy);
-TaskRouter.get("/getperformance", Auth, getPerformanceOfAMentee);
+TaskRouter.post("/getperformance", Auth, getPerformanceOfAMentee);
 export default TaskRouter;
