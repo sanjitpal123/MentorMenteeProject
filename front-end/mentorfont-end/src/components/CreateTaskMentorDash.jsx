@@ -20,7 +20,7 @@ function CreateTask() {
   const [FormData, setFormData] = useState({
     Title: "",
     Description: "",
-    Duedate: "",
+    Duedate: null,
     Questions: [],
     Mentees: [],
   });

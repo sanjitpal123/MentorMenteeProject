@@ -1,6 +1,5 @@
 import mongoose, { Mongoose } from "mongoose";
 import bcrypt from "bcrypt";
-import Notice from "./Notification.js";
 
 const userSchema = mongoose.Schema(
   {
@@ -8,7 +7,9 @@ const userSchema = mongoose.Schema(
     password: { type: String, required: true },
     email: { type: String, unique: true, required: true },
     skills: [String],
-
+    profile: {
+      type: String,
+    },
     role: {
       type: String,
       enum: ["mentor", "mentee"],

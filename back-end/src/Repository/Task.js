@@ -13,7 +13,9 @@ export const GetTaskForASpecificUserRepo = async (userId) => {
   try {
     const res = await Task.find({
       $or: [{ CreatedBy: userId }, { Mentees: { $in: [userId] } }],
-    });
+    })
+      .populate({ path: "Mentees", select: "-password" })
+      .populate({ path: "CreatedBy", select: "-password" });
     return res;
   } catch (error) {
     throw error;

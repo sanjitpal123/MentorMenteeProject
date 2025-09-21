@@ -2,9 +2,11 @@ import { GlobalContext } from "../ContextApiStore/ContextStore";
 import { getTask } from "../services/Task";
 import { useContext, useEffect, useState } from "react";
 import { Calendar } from "lucide-react";
+import { GetPerformanceOfMentee } from "../services/Performance";
 function ManageTask() {
   const { User } = useContext(GlobalContext);
   const user = JSON.parse(localStorage.getItem("user"));
+  console.log("user", user);
   const [tasks, setTasks] = useState([]);
   async function GetAllTask() {
     try {
@@ -15,17 +17,26 @@ function ManageTask() {
       console.log("error to get task", error);
     }
   }
+  async function handleSeePerformance(mentee, task) {
+    try {
+      const result = await GetPerformanceOfMentee(user.token, {
+        mentee,
+        task,
+      });
+      console.log("result of performance ", result);
+    } catch (error) {
+      console.log("error to see performance", error);
+    }
+  }
   useEffect(() => {
     GetAllTask();
     console.log("task", tasks);
   }, []);
   return (
     <div className="space-y-6">
-      {/* Search and Filter */}
       <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            ?{" "}
             <input
               type="text"
               placeholder="Search tasks..."
@@ -58,77 +69,56 @@ function ManageTask() {
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-2">
-                {/* {getStatusIcon(task.status)} */}
                 <span className="text-sm text-gray-400">{task.status}</span>
               </div>
-              {/* <span
-                className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(
-                  task.priority
-                )}`}
-              >
-                {task.priority}
-              </span> */}
-              {/* <span
-                className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(
-                  task.priority
-                )}`}
-              >
-                {task.priority}
-              </span> */}
             </div>
 
-            <h3 className="text-lg font-bold text-white mb-2">{task.title}</h3>
+            <h3 className="text-lg font-bold text-white mb-2">{task.Title}</h3>
             <p className="text-gray-400 text-sm mb-4 line-clamp-2">
-              {task.description}
+              {task.Description}
             </p>
 
             <div className="flex items-center justify-between text-sm text-gray-400 mb-4">
               <div className="flex items-center">
                 <Calendar className="w-4 h-4 mr-1" />
-                {task.dueDate}
-              </div>
-              <span className="bg-gray-800 px-2 py-1 rounded">{task.type}</span>
-            </div>
-            {/* 
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-400">Assigned to:</span>
-              <div className="flex -space-x-1">
-                {task.assignedTo.slice(0, 3).map((menteeId) => {
-                  const mentee = mentees.find((m) => m.id === menteeId);
-                  return (
-                    <div
-                      key={menteeId}
-                      className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-xs font-semibold border-2 border-gray-900"
-                    >
-                      {mentee?.avatar}
-                    </div>
-                  );
-                })}
-                {task.assignedTo.length > 3 && (
-                  <div className="w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center text-xs font-semibold border-2 border-gray-900">
-                    +{task.assignedTo.length - 3}
-                  </div>
-                )}
-              </div>
-            </div> */}
+                {new Date(task.updatedAt).toLocaleTimeString([], {
+                  day: "2-digit",
+                  month: "2-digit",
 
-            {/* {task.questions && task.questions.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-gray-800">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <HelpCircle className="w-4 h-4 text-blue-400" />
-                    <span className="text-sm text-gray-400">Questions:</span>
-                    <span className="text-sm font-semibold text-blue-400">
-                      {task.questions.length}
-                    </span>
-                  </div>
-                  <div className="text-sm text-gray-400">
-                    {task.questions.reduce((sum, q) => sum + q.points, 0)} pts
-                    total
-                  </div>
-                </div>
+                  year: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </div>
-            )} */}
+              <span className="bg-gray-800 px-2 py-1 rounded">
+                <p className="text-red-500">Due Date</p>
+                {new Date(task.Duedate).toLocaleTimeString([], {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </div>
+            <div className="flex gap-4 items-center">
+              <h4>Attended By</h4>
+              <div className="flex  items-center">
+                {task.Mentees?.map((mentee) => (
+                  <div
+                    className="w-[50px] ml-[-5px] bg-red-900 text-white flex justify-center items-center h-[50px] rounded-full"
+                    onClick={() => handleSeePerformance(mentee._id, task._id)}
+                  >
+                    {mentee?.profile
+                      ? mentee.profile
+                      : mentee.name.charAt(0).toUpperCase() +
+                        mentee.name
+                          .charAt(mentee.name.length - 1)
+                          .toUpperCase()}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         ))}
       </div>

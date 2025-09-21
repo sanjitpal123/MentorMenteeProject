@@ -18,3 +18,16 @@ export const StoreScore = async (token, obj) => {
     throw error;
   }
 };
+
+export const GetPerformanceOfMentee = async (token, obj) => {
+  try {
+    const res = await axiosInstance.get("/task/getperformance", obj, {
+      headers: {
+        authorization: `Bearer ${token}`, // <-- Make sure A is capital
+      },
+    });
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

@@ -60,3 +60,27 @@ export const createPerformance = async (req, res) => {
     });
   }
 };
+
+export const getPerformanceOfAMentee = async (req, res) => {
+  try {
+    const { mentee, task } = req.body;
+    const isExisted = await isCheckedExistedScoreService(mentee, task);
+    if (!isExisted) {
+      return res.status(404).json({
+        message: "Can not get performance ",
+        success: false,
+      });
+    }
+    return res.status(201).json({
+      success: true,
+      message: "get the performance of mentee",
+      isExisted,
+    });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(501).json({
+      message: "Internal server error",
+      success: false,
+    });
+  }
+};
