@@ -3,9 +3,12 @@ import { getTask } from "../services/Task";
 import { useContext, useEffect, useState } from "react";
 import { Calendar } from "lucide-react";
 import { GetPerformanceOfMentee } from "../services/Performance";
+import { useNavigate } from "react-router-dom";
 function ManageTask() {
   const { User } = useContext(GlobalContext);
+  const navigator = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
+  const [performance, setPerformance] = useState(null);
   console.log("user", user);
   const [tasks, setTasks] = useState([]);
   async function GetAllTask() {
@@ -23,7 +26,12 @@ function ManageTask() {
         mentee,
         task,
       });
-      console.log("result of performance ", result);
+
+      console.log("result of performance in managetask ", result);
+
+      navigator("/performance-seen-of-mentee", {
+        state: { performance: result.isExisted },
+      });
     } catch (error) {
       console.log("error to see performance", error);
     }
@@ -104,15 +112,15 @@ function ManageTask() {
             <div className="flex gap-4 items-center">
               <h4>Attended By</h4>
               <div className="flex  items-center">
-                {task.Mentees?.map((mentee) => (
+                {task.AttendedBy?.map((mentee) => (
                   <div
                     className="w-[50px] ml-[-5px] bg-red-900 text-white flex justify-center items-center h-[50px] rounded-full"
                     onClick={() => handleSeePerformance(mentee._id, task._id)}
                   >
                     {mentee?.profile
-                      ? mentee.profile
-                      : mentee.name.charAt(0).toUpperCase() +
-                        mentee.name
+                      ? mentee?.profile
+                      : mentee?.name.charAt(0).toUpperCase() +
+                        mentee?.name
                           .charAt(mentee.name.length - 1)
                           .toUpperCase()}
                   </div>

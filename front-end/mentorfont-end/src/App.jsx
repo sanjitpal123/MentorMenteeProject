@@ -27,6 +27,7 @@ import MenteeDashboard from "./pages/MenteeDashboard";
 import ScheduleSession from "./pages/ScheduleSessionPage";
 import TaskAttendPage from "./pages/TaskAtttendPage";
 import TaskResultPage from "./pages/TaskResult";
+import PerformanceMentee from "./pages/PerformanceSeenOfMenteeInMentorDashboard";
 
 function App() {
   const { setUser, User } = useContext(GlobalContext);
@@ -71,6 +72,10 @@ function App() {
             <Route path="/createsession" element={<ScheduleSession />} />
             <Route path="/attendtask/:id" element={<TaskAttendPage />} />
             <Route path="/result" element={<TaskResultPage />} />
+            <Route
+              path="performance-seen-of-mentee"
+              element={<PerformanceMentee />}
+            />
           </Route>
         </Routes>
       </Router>

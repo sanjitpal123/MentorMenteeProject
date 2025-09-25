@@ -11,7 +11,12 @@ export const CreatePerformanceRepo = async (data) => {
 
 export const CheckIsExisted = async (mentee, task) => {
   try {
-    const isExisted = await Performance.findOne({ mentee, task });
+    console.log("mentee", mentee, "and task", task);
+    const isExisted = await Performance.findOne({ mentee, task }).populate(
+      "mentee"
+    );
+    console.log("isExisted", isExisted);
+
     return isExisted; // null if not found, doc if found
   } catch (error) {
     throw error;
