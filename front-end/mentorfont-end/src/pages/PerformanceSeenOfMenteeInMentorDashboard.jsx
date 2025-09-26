@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
-  User,
   Mail,
   Github,
   Linkedin,
@@ -13,18 +12,27 @@ import {
   Bot,
 } from "lucide-react";
 import AiAsk from "../services/AIQuestionAndAnswer";
-
+import { GlobalContext } from "../ContextApiStore/ContextStore";
+import { SubmitFeedback } from "../services/Feedback";
 function PerformanceMentee() {
   const location = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
+  const { User } = useContext(GlobalContext);
+  const wholeobj = JSON.parse(localStorage.getItem("user"));
   const { performance } = location.state || {};
+  const [feedBackOFAi, setFeedBackOfAi] = useState(null);
+
   console.log("performance", performance);
 
   async function handleAiFeedback() {
     console.log("click");
+    setFeedBackOfAi("");
+    setIsLoading(true);
+
     try {
       const content = `
-You are an expert mentor. Generate a **short, attractive, and motivational feedback** for a mentee based on the following data. 
-Do **not** add any preamble like "Here is the feedback" or "Written below is feedback". 
+You are an expert mentor. Generate a **short, attractive, and motivational feedback for a mentee based on the following data. 
+Do **not** and also don't need !**\n \n add any preamble like "Here is the feedback" or "Written below is feedback". 
 Do **not** include the words "feedback" or "score" in your response. 
 Make it positive,but also give reality , it should be reality feedback not that fake with simple words  
 Mentee Name: ${performance.mentee.name}
@@ -37,9 +45,21 @@ Output **only the feedback text**.
 `;
       const res = await AiAsk(content);
       console.log("response to write feedback by ai", res);
+      setFeedBackOfAi(res.parts[0].text);
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       console.log("error to write feedback by ai", error);
     }
+  }
+  async function handleSubmitFeedback() {
+    // try {
+    //   const data = { mentee: performance.mentee._id, mentor: wholeobj._id };
+    //   const res = await SubmitFeedback(wholeobj.token, data);
+    //   console.log("response to submit feedback", res);
+    // } catch (error) {
+    //   console.log("responsive to submit feedback", error);
+    // }
   }
 
   return (
@@ -265,13 +285,11 @@ Output **only the feedback text**.
                     className="w-full h-40 p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
                   ></textarea>
 
-                  <button className="mt-4 w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 rounded-lg transition-colors duration-300">
-                    Submit
-                  </button>
                   <div className="flex items-center gap-3 mb-4">
                     <MessageSquare className="w-6 h-6 text-red-400" />
                     <h3 className="font-semibold text-white">Give Feedback</h3>
                   </div>
+
                   <p className="text-gray-400 text-sm mb-4">
                     Write personalized feedback based on the mentee's
                     performance
@@ -279,6 +297,9 @@ Output **only the feedback text**.
                   <button className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2">
                     <MessageSquare className="w-4 h-4" />
                     Write Feedback
+                  </button>
+                  <button className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition-colors duration-300">
+                    Submit
                   </button>
                 </div>
 
@@ -292,13 +313,32 @@ Output **only the feedback text**.
                     Generate intelligent feedback using AI based on performance
                     data
                   </p>
-                  <button
-                    onClick={() => handleAiFeedback()}
-                    className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
-                  >
-                    <Bot className="w-4 h-4" />
-                    Generate AI Feedback
-                  </button>
+                  {!isLoading && feedBackOFAi && (
+                    <textarea
+                      placeholder="Write feedback here..."
+                      value={feedBackOFAi && feedBackOFAi}
+                      onChange={(e) => setFeedBackOfAi(e.target.value)}
+                      className="w-full h-40 p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                    ></textarea>
+                  )}
+                  {!feedBackOFAi ? (
+                    <button
+                      onClick={() => handleAiFeedback()}
+                      className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                      <Bot className="w-4 h-4" />
+                      {`${
+                        isLoading ? "Generating..." : "Generate AI Feedback"
+                      }`}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleSubmitFeedback}
+                      className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition-colors duration-300"
+                    >
+                      Submit
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

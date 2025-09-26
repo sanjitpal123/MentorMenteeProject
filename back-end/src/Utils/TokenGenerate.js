@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 export const GenerateToken = async (user) => {
   try {
     const token = jwt.sign({ userId: user._id }, process.env.SECRET, {
-      expiresIn: "7d",
+      expiresIn: "30d",
     });
     return token;
   } catch (error) {
