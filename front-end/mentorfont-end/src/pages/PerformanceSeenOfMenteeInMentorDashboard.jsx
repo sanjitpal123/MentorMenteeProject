@@ -2,10 +2,9 @@ import React, { useContext, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
   Mail,
-  Github,
-  Linkedin,
   Trophy,
   Target,
+  // User AS userIcon,
   CheckCircle,
   XCircle,
   MessageSquare,
@@ -14,6 +13,7 @@ import {
 import AiAsk from "../services/AIQuestionAndAnswer";
 import { GlobalContext } from "../ContextApiStore/ContextStore";
 import { SubmitFeedback } from "../services/Feedback";
+import { toast } from "react-toastify";
 function PerformanceMentee() {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
@@ -21,8 +21,7 @@ function PerformanceMentee() {
   const wholeobj = JSON.parse(localStorage.getItem("user"));
   const { performance } = location.state || {};
   const [feedBackOFAi, setFeedBackOfAi] = useState(null);
-
-  console.log("performance", performance);
+  const [feedback2, setFeedback2] = useState("");
 
   async function handleAiFeedback() {
     console.log("click");
@@ -53,13 +52,33 @@ Output **only the feedback text**.
     }
   }
   async function handleSubmitFeedback() {
-    // try {
-    //   const data = { mentee: performance.mentee._id, mentor: wholeobj._id };
-    //   const res = await SubmitFeedback(wholeobj.token, data);
-    //   console.log("response to submit feedback", res);
-    // } catch (error) {
-    //   console.log("responsive to submit feedback", error);
-    // }
+    try {
+      const data = {
+        mentee: performance.mentee._id,
+        mentor: wholeobj._id,
+        comment: feedBackOFAi,
+      };
+      const res = await SubmitFeedback(wholeobj.token, data);
+      console.log("response to submit feedback", res);
+      toast.success("Submitted feedback successfully");
+      setFeedBackOfAi("");
+    } catch (error) {
+      console.log("responsive to submit feedback", error);
+    }
+  }
+  async function handleFeedByManual() {
+    console.log("click");
+    try {
+      const data = {
+        mentee: performance.mentee._id,
+        mentor: wholeobj._id,
+        comment: feedback2,
+      };
+      const response = await SubmitFeedback(wholeobj.token, data);
+      toast.success("Submitted Feedback Successfully");
+    } catch (error) {
+      console.log("error to send feedback ", error);
+    }
   }
 
   return (
@@ -82,7 +101,7 @@ Output **only the feedback text**.
             <div className="bg-gray-900 rounded-xl p-6 border border-red-500/20 hover:border-red-500/40 transition-all duration-300">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center">
-                  <User className="w-6 h-6 text-white" />
+                  {/* <User className="w-6 h-6 text-white" /> */}
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-red-400">
@@ -94,7 +113,7 @@ Output **only the feedback text**.
 
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <User className="w-5 h-5 text-red-400" />
+                  {/* <User className="w-5 h-5 text-red-400" /> */}
                   <div>
                     <p className="text-sm text-gray-400">Name</p>
                     <p className="font-medium">{performance.mentee.name}</p>
@@ -120,7 +139,7 @@ Output **only the feedback text**.
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <Github className="w-5 h-5 text-red-400" />
+                  {/* <Github className="w-5 h-5 text-red-400" /> */}
                   <div>
                     <p className="text-sm text-gray-400">GitHub</p>
                     <p className="font-medium text-blue-400">
@@ -130,7 +149,6 @@ Output **only the feedback text**.
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <Linkedin className="w-5 h-5 text-red-400" />
                   <div>
                     <p className="text-sm text-gray-400">LinkedIn</p>
                     <p className="font-medium text-blue-400">
@@ -144,7 +162,6 @@ Output **only the feedback text**.
               <div className="mt-6 pt-6 border-t border-gray-700">
                 <p className="text-sm text-gray-400 mb-2">Bio</p>
                 <p className="text-gray-300 leading-relaxed">
-                  {" "}
                   {performance?.mentee.bio}{" "}
                 </p>
               </div>
@@ -282,6 +299,8 @@ Output **only the feedback text**.
                 <div className="bg-black/50 rounded-lg p-6 border border-gray-700 hover:border-red-500/50 transition-all duration-300">
                   <textarea
                     placeholder="Write feedback here..."
+                    value={feedback2}
+                    onChange={(e) => setFeedback2(e.target.value)}
                     className="w-full h-40 p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
                   ></textarea>
 
@@ -298,7 +317,10 @@ Output **only the feedback text**.
                     <MessageSquare className="w-4 h-4" />
                     Write Feedback
                   </button>
-                  <button className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition-colors duration-300">
+                  <button
+                    className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition-colors duration-300"
+                    onClick={handleFeedByManual}
+                  >
                     Submit
                   </button>
                 </div>

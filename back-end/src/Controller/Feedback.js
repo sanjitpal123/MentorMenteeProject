@@ -1,4 +1,6 @@
+import message from "../Model/Message.js";
 import { CreateFeedbackService } from "../Services/FeedBack.js";
+import { GetMenteeByIdService } from "../Services/Mentee.js";
 
 export const CreateFeedBack = async (req, res) => {
   try {
@@ -10,12 +12,22 @@ export const CreateFeedBack = async (req, res) => {
     }
 
     const created = await CreateFeedbackService({ mentee, mentor, comment });
+    const menteeexist = await GetMenteeByIdService(mentee);
+    if (!menteeexist) {
+      return res.status(404).json({
+        message: "Could find mentee with this id",
+        success: false,
+      });
+    }
+
     if (!created) {
       return res.status(403).json({
         message: "Could not create feedback",
         success: true,
       });
     }
+    menteeexist.feedback.push(created._id);
+    await menteeexist.save();
     return res.status(201).json({
       message: "Created Feedback",
       created,

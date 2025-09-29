@@ -1,4 +1,4 @@
-import mongoose, { Mongoose } from "mongoose";
+import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
 const userSchema = mongoose.Schema(
@@ -23,6 +23,7 @@ const userSchema = mongoose.Schema(
     experience: { type: Number },
     price: { type: Number },
     notication: [{ type: mongoose.Schema.Types.ObjectId, ref: "Notice" }],
+    feedback: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feedback" }],
     reviews: [
       {
         type: mongoose.Schema.Types.ObjectId,
