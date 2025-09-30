@@ -31,3 +31,20 @@ export const GetPerformanceOfMentee = async (token, obj) => {
     throw error;
   }
 };
+
+export const GetAllScoresOfMenteesOfATask = async (token, taskid) => {
+  try {
+    const res = await axiosInstance.post(
+      "/performance/getallperformanceofatask",
+      { taskid },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

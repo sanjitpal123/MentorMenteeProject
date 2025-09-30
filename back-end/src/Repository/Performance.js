@@ -1,5 +1,5 @@
 import Performance from "../Model/Performance.js";
-
+import mongoose from "mongoose";
 export const CreatePerformanceRepo = async (data) => {
   try {
     const res = await Performance.create(data);
@@ -23,14 +23,29 @@ export const CheckIsExisted = async (mentee, task) => {
   }
 };
 
-export const UpdateScore = async (taskid, data) => {
+export const UpdateScore = async (taskid, menteeid, data) => {
   try {
-    const res = await Performance.findByIdAndUpdate(
-      taskid,
-      { $set: data },
-      { new: true }
+    // menteeid must be a valid ObjectId string
+    const res = await Performance.findOneAndUpdate(
+      { mentee: menteeid }, // filter
+      { $set: data }, // must be an object with fields to update
+      { new: true, upsert: true } // return updated doc, don't create new
     );
+
+    console.log("response to update score", res);
     return res;
+  } catch (error) {
+    console.error("error to update performance", error);
+    throw error;
+  }
+};
+
+export const getPerformanceOfAllMenteeInATaskRepo = async (taskId) => {
+  try {
+    const performances = await Performance.find({ task: taskId })
+      .populate("mentee", "-password")
+      .sort({ score: -1 });
+    return performances;
   } catch (error) {
     throw error;
   }

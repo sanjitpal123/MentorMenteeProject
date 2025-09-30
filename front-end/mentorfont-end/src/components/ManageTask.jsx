@@ -36,6 +36,10 @@ function ManageTask() {
       console.log("error to see performance", error);
     }
   }
+  function handleNavigate(id) {
+    console.log("click");
+    navigator(`/taskwinning/${id}`);
+  }
   useEffect(() => {
     GetAllTask();
     console.log("task", tasks);
@@ -74,6 +78,7 @@ function ManageTask() {
           <div
             key={task.id}
             className="bg-gray-900 rounded-xl border border-gray-800 p-6 hover:border-gray-700 transition-colors"
+            onClick={() => handleNavigate(task._id)}
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-2">

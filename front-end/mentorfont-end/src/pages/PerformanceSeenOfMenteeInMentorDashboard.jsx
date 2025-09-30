@@ -22,6 +22,7 @@ function PerformanceMentee() {
   const { performance } = location.state || {};
   const [feedBackOFAi, setFeedBackOfAi] = useState(null);
   const [feedback2, setFeedback2] = useState("");
+  const [ClickedOnWriteFeedback, setClickedOnWriteFeedback] = useState(false);
 
   async function handleAiFeedback() {
     console.log("click");
@@ -51,6 +52,10 @@ Output **only the feedback text**.
       console.log("error to write feedback by ai", error);
     }
   }
+  function handleWriteFeedbackClick() {
+    setClickedOnWriteFeedback(true);
+  }
+
   async function handleSubmitFeedback() {
     try {
       const data = {
@@ -76,6 +81,8 @@ Output **only the feedback text**.
       };
       const response = await SubmitFeedback(wholeobj.token, data);
       toast.success("Submitted Feedback Successfully");
+      setFeedback2("");
+      setClickedOnWriteFeedback(false);
     } catch (error) {
       console.log("error to send feedback ", error);
     }
@@ -297,32 +304,38 @@ Output **only the feedback text**.
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Manual Feedback */}
                 <div className="bg-black/50 rounded-lg p-6 border border-gray-700 hover:border-red-500/50 transition-all duration-300">
-                  <textarea
-                    placeholder="Write feedback here..."
-                    value={feedback2}
-                    onChange={(e) => setFeedback2(e.target.value)}
-                    className="w-full h-40 p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
-                  ></textarea>
-
+                  {ClickedOnWriteFeedback && (
+                    <textarea
+                      placeholder="Write feedback here..."
+                      value={feedback2}
+                      onChange={(e) => setFeedback2(e.target.value)}
+                      className="w-full h-40 p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                    ></textarea>
+                  )}
                   <div className="flex items-center gap-3 mb-4">
                     <MessageSquare className="w-6 h-6 text-red-400" />
                     <h3 className="font-semibold text-white">Give Feedback</h3>
                   </div>
-
                   <p className="text-gray-400 text-sm mb-4">
                     Write personalized feedback based on the mentee's
                     performance
                   </p>
-                  <button className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2">
-                    <MessageSquare className="w-4 h-4" />
-                    Write Feedback
-                  </button>
-                  <button
-                    className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition-colors duration-300"
-                    onClick={handleFeedByManual}
-                  >
-                    Submit
-                  </button>
+                  {feedback2 ? (
+                    <button
+                      className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition-colors duration-300"
+                      onClick={handleFeedByManual}
+                    >
+                      Submit
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleWriteFeedbackClick}
+                      className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      Write Feedback
+                    </button>
+                  )}
                 </div>
 
                 {/* AI Feedback */}

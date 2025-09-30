@@ -1,5 +1,6 @@
 import {
   CreatePerformanceService,
+  getPerformanceOfAllMenteeInATaskService,
   isCheckedExistedScoreService,
   updatedScoreService,
 } from "../Services/Performance.js";
@@ -13,10 +14,9 @@ export const createPerformance = async (req, res) => {
     const isExisted = await isCheckedExistedScoreService(mentee, task);
     console.log("isexited", isExisted);
     if (isExisted) {
-      const result = await updatedScoreService(isExisted._id, {
+      const result = await updatedScoreService(isExisted._id, mentee, {
         totalquestion,
         score,
-        mentee,
         correctanswer,
         wronganswer,
         task,
@@ -83,4 +83,24 @@ export const getPerformanceOfAMentee = async (req, res) => {
       success: false,
     });
   }
+};
+
+export const getPerformanceOfAllMenteeInATask = async (req, res) => {
+  try {
+    const { taskid } = req.body;
+    const respose = await getPerformanceOfAllMenteeInATaskService(taskid);
+    if (!taskid) {
+      return res.status(404).json({
+        success: false,
+        message: "Please provide taskid",
+      });
+    }
+    if (!respose) {
+      return res.status(403).json({
+        message: "Can not get performances",
+        success: false,
+      });
+    }
+    return res.status(201).json(respose);
+  } catch (error) {}
 };

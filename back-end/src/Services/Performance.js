@@ -1,6 +1,7 @@
 import {
   CheckIsExisted,
   CreatePerformanceRepo,
+  getPerformanceOfAllMenteeInATaskRepo,
   UpdateScore,
 } from "../Repository/Performance.js";
 
@@ -21,9 +22,18 @@ export const isCheckedExistedScoreService = async (mentee, task) => {
     throw error;
   }
 };
-export const updatedScoreService = async (id, data) => {
+export const updatedScoreService = async (id, menteeid, data) => {
   try {
-    const res = await UpdateScore(id, data);
+    const res = await UpdateScore(id, menteeid, data);
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getPerformanceOfAllMenteeInATaskService = async (taskid) => {
+  try {
+    const res = await getPerformanceOfAllMenteeInATaskRepo(taskid);
     return res;
   } catch (error) {
     throw error;
