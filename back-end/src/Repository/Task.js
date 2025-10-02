@@ -44,3 +44,17 @@ export const whoAttendRepo = async (id, mentee) => {
     throw error;
   }
 };
+export const DeleteExpireTaskFromMentee = async (mentee, taskid) => {
+  try {
+    const removed = await Task.findByIdAndUpdate(
+      taskid,
+      {
+        $pull: { Mentees: mentee },
+      },
+      { new: true }
+    );
+    return removed;
+  } catch (error) {
+    throw error;
+  }
+};

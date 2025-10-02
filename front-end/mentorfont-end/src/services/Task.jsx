@@ -50,3 +50,19 @@ export const Attended = async (token, obj) => {
     throw error;
   }
 };
+
+export const DeleteExpireOne = async (token, taskId) => {
+  try {
+    const res = await axiosInstance.put(
+      "/task/deleteexpiretask",
+      { taskId },
+      {
+        headers: { authorization: `Bearer ${token}` },
+      }
+    );
+
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

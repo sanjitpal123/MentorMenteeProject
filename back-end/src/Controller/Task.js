@@ -2,6 +2,7 @@ import message from "../Model/Message.js";
 import {
   AttendedByService,
   CreateTaskService,
+  DeleteExpireOneService,
   GetATaskByIdService,
   GetTaskForASpecificUserService,
 } from "../Services/Task.js";
@@ -105,6 +106,42 @@ export const AttendedBy = async (req, res) => {
     return res.status(501).json({
       success: false,
       message: "Internal server error",
+    });
+  }
+};
+
+export const DeleteExpireTaskFromMenteeProfile = async (req, res) => {
+  try {
+    const mentee = req.user.userId;
+    const { taskId } = req.body;
+    if (!mentee) {
+      return res.status(404).json({
+        message: "Could not get mentee id",
+        success: false,
+      });
+    }
+    if (!taskId) {
+      return res.status(404).json({
+        message: "Could not get taskid",
+        success: false,
+      });
+    }
+    const deleted = await DeleteExpireOneService(mentee, taskId);
+    if (!deleted) {
+      return res.status(403).json({
+        message: "Could not delete",
+        success: false,
+      });
+    }
+    return res.status(201).json({
+      message: "Deleted successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.log("error to delete task", error);
+    return res.status(501).json({
+      message: "Internal server error ",
+      success: false,
     });
   }
 };

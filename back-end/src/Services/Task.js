@@ -1,5 +1,6 @@
 import {
   CreateTaskRepo,
+  DeleteExpireTaskFromMentee,
   GetATaskByIdRepo,
   GetTaskForASpecificUserRepo,
   whoAttendRepo,
@@ -35,6 +36,15 @@ export const AttendedByService = async (id, mentee) => {
   try {
     const res = await whoAttendRepo(id, mentee);
     return res;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const DeleteExpireOneService = async (mentee, taskid) => {
+  try {
+    const deleted = await DeleteExpireTaskFromMentee(mentee, taskid);
+    return deleted;
   } catch (error) {
     throw error;
   }

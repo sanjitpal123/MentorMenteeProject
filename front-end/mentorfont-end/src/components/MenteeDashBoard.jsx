@@ -120,7 +120,7 @@ import {
   RadialBar,
 } from "recharts";
 import { GlobalContext } from "../ContextApiStore/ContextStore";
-import { getTask } from "../services/Task";
+import { DeleteExpireOne, getTask } from "../services/Task";
 import { useNavigate } from "react-router-dom";
 function AdvancedTab() {
   return (
@@ -180,9 +180,32 @@ export const Task = () => {
   function HandleNavigate(id) {
     navigator(`/attendtask/${id}`);
   }
+
   useEffect(() => {
     FetchAllTask();
   }, []);
+  async function DeleteExpireTask(taskid) {
+    try {
+      const res = await DeleteExpireOne(user.token, taskid);
+      console.log("response to delete expire task", res);
+      FetchAllTask();
+    } catch (error) {
+      console.log("error to delete expire one", error);
+    }
+  }
+
+  useEffect(() => {
+    Tasks.forEach((task) => {
+      const tasktime = new Date(task.Duedate); // convert string to Date
+      const currenttime = new Date();
+
+      if (tasktime < currenttime) {
+        DeleteExpireTask(task._id);
+      } else {
+        console.log(`${task.Duedate} is still valid`);
+      }
+    });
+  }, [Tasks]);
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center bg-black p-6">
@@ -219,12 +242,22 @@ export const Task = () => {
                   {task.Duedate ? new Date(task.Duedate).toDateString() : "NA"}
                 </span>
                 <span
-                  className={`flex items-center gap-1 font-medium ${
-                    task.completed ? "text-green-400" : "text-red-400"
-                  }`}
+                  className={`flex items-center gap-1 font-medium ${task.AttendedBy.map(
+                    (mentee) =>
+                      mentee._id === user._id
+                        ? "text-green-400"
+                        : "text-red-400"
+                  )}`}
                 >
-                  {task.completed ? "Completed" : "Pending"}
-                  {!task.completed && <AlertCircle className="w-4 h-4" />}
+                  {task.AttendedBy.map((mentee) =>
+                    mentee._id === user._id ? "Completed" : "Pending"
+                  )}
+                  {task.AttendedBy.map(
+                    (mentee) =>
+                      mentee._id !== user._id && (
+                        <AlertCircle className="w-4 h-4" />
+                      )
+                  )}
                 </span>
               </div>
             </div>
