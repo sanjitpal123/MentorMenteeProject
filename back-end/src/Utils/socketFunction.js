@@ -78,6 +78,13 @@ export const SocketServer = (socket, io) => {
       io.to(id.toString()).emit("NotifyingAboutTask")
     );
   });
+  socket.on("notifyAboutAttendingtask", ({ mentorId }) => {
+    console.log(
+      "sending notification to mentor after attending task",
+      mentorId
+    );
+    io.to(mentorId.toString()).emit("GetNotificationAboutTaskAttendedBy");
+  });
   // for offline user
 
   socket.on("disconnect", () => {

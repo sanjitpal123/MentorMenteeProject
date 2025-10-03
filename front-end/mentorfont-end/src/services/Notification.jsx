@@ -1,6 +1,8 @@
 import axiosInstance from "./AxiosInstance";
 
 export const CreateNotificationSer = async (data, token) => {
+  console.log("tokenwhile createing ", token);
+
   try {
     const res = await axiosInstance.post("/notification/create", data, {
       headers: {

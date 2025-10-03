@@ -4,6 +4,8 @@ import { Attended, GetTaskById } from "../services/Task";
 import { GlobalContext } from "../ContextApiStore/ContextStore";
 import { Clock, CheckCircle, Trophy, Target, Timer, Award } from "lucide-react";
 import { StoreScore } from "../services/Performance";
+import { socket } from "../utils/socket";
+import { CreateNotificationSer } from "../services/Notification";
 
 function TaskAttendPage() {
   const { id } = useParams();
@@ -34,6 +36,24 @@ function TaskAttendPage() {
     }
   }
 
+  async function GenerateNotification() {
+    try {
+      const data = {
+        receiver: Task?.CreatedBy?._id || Task?.CreatedBy,
+        message: `${user.name} has attended a task which was given to him `,
+        type: "info",
+        isRead: false,
+        title: `${Task.Title}  task has attended by  ${user.name}  `,
+        convoId: null,
+        sessionId: null,
+      };
+      const res = await CreateNotificationSer(data, user.token);
+      console.log("response to create notificatin  ", res);
+    } catch (error) {
+      console.log("error to generate notification", error);
+    }
+  }
+
   async function handleSubmit() {
     try {
       setIsSubmitting(true);
@@ -52,6 +72,17 @@ function TaskAttendPage() {
         task: id,
       });
       console.log("response to score performance", result);
+      socket.emit("notifyAboutAttendingtask", {
+        mentorId: Task?.CreatedBy?._id || Task?.CreatedBy,
+      });
+
+      Task.AttendedBy.map((mentee) => {
+        console.log("menttes", mentee);
+        if (mentee.toString() !== user._id.toString()) {
+          GenerateNotification();
+        }
+      });
+
       navigator("/result", {
         state: {
           total: Task.Questions.length,
@@ -85,6 +116,9 @@ function TaskAttendPage() {
   useEffect(() => {
     GetATask();
   }, [id]);
+  useEffect(() => {
+    console.log("user", user.token);
+  }, []);
 
   if (!Task) {
     return (

@@ -59,9 +59,21 @@ export default function MentorDashboard() {
       toast.dismiss();
       toast.info("New Session Has Been Created");
     };
+    const handleTaskAttendingNotification = () => {
+      toast.dismiss();
+      toast.success("Someone Has Attended Task");
+    };
+    socket.on(
+      "GetNotificationAboutTaskAttendedBy",
+      handleTaskAttendingNotification
+    );
     socket.on("Notification", handleNotification);
     return () => {
       socket.off("Notification", handleNotification);
+      socket.off(
+        "GetNotificationAboutTaskAttendedBy",
+        handleTaskAttendingNotification
+      );
     };
   }, []);
 
