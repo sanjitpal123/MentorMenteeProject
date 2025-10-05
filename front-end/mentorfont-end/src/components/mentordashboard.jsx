@@ -56,9 +56,11 @@ export const WelcomeMessage = () => {
 };
 
 export const States = () => {
-  const { User } = useContext(GlobalContext);
+  const { User, sessions, setsessions } = useContext(GlobalContext);
   const user = JSON.parse(localStorage.getItem("user"));
   const [Mentees, setMentess] = useState(0);
+  const [Sessions, setSessions] = useState([]);
+  const [SessionsCount, setSessionsCount] = useState(0);
   // calling this api for getting mentee profile also
   async function GetMentorProfile() {
     try {
@@ -70,12 +72,44 @@ export const States = () => {
     }
   }
 
+  async function GetAllSessions() {
+    try {
+      const res = await GetAllSessionSer(user.token);
+      console.log("response to all all sessions", res);
+      setSessions(res.response);
+      setsessions(res.response);
+    } catch (error) {
+      console.log("errror to get all sessions", error);
+    }
+  }
+  function SessionExtractOnlyForCurrentMonth() {
+    const currentDate = new Date(); // ✅ use consistent naming
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+
+    const filtered = Sessions.filter((session) => {
+      const sessionDate = new Date(session.date);
+      return (
+        sessionDate.getMonth() === currentMonth &&
+        sessionDate.getFullYear() === currentYear
+      );
+    });
+    console.log("filteted", filtered);
+
+    setSessionsCount(filtered.length);
+  }
+
   useEffect(() => {
     socket.emit("join", user._id);
   }, [user._id]);
 
   useEffect(() => {
+    SessionExtractOnlyForCurrentMonth();
+  }, [Sessions]);
+
+  useEffect(() => {
     GetMentorProfile();
+    GetAllSessions();
   }, []);
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -90,7 +124,7 @@ export const States = () => {
         {
           icon: Calendar,
           label: "Sessions This Month",
-          value: "48",
+          value: `${SessionsCount}`,
           change: "+8%",
           color: "from-red-700 to-red-800",
         },
@@ -167,152 +201,126 @@ import MenteeTaskOverView from "./MenteeTaskoverview";
 import MenteeTaskOverViewForMentorDashBoard from "./MenteeTaskoverview";
 
 // Exact colors (no Tailwind palette approximations)
-const COLORS = {
-  bg: "#000000", // pure black
-  panel: "#0b0b0b", // near-black panel
-  bubbleUser: "#ff1a1a", // vivid red
-  bubbleAI: "#121212", // dark bubble for AI
-  borderRed: "#ff1a1a",
-  textMuted: "#b3b3b3",
-  chipBg: "#111111",
-};
+// const COLORS = {
+//   bg: "#000000", // pure black
+//   panel: "#0b0b0b", // near-black panel
+//   bubbleUser: "#ff1a1a", // vivid red
+//   bubbleAI: "#121212", // dark bubble for AI
+//   borderRed: "#ff1a1a",
+//   textMuted: "#b3b3b3",
+//   chipBg: "#111111",
+// };
 
 // Demo canned responses
-const demoReply = (input) => {
-  if (!input) return "How can I help?";
-  const lower = input.toLowerCase();
-  if (lower.includes("error") || lower.includes("bug"))
-    return "Let's squash that bug. Share the error message and a minimal code snippet, and I'll propose a fix + why it happens.";
-  if (lower.includes("schema") || lower.includes("model"))
-    return "For mentor/mentee, prefer separate collections if they diverge in fields/queries; otherwise a single Users collection with a `role` and role-specific subdocs works. I can sketch both!";
-  if (lower.includes("optimize") || lower.includes("performance"))
-    return "Profile first. Measure slow paths, then cache, paginate, and ship fewer bytes. I can give you a step-by-step checklist.";
-  return "Got it. I'll break this down, propose an approach, and provide code you can paste in.";
-};
+// const demoReply = (input) => {
+//   if (!input) return "How can I help?";
+//   const lower = input.toLowerCase();
+//   if (lower.includes("error") || lower.includes("bug"))
+//     return "Let's squash that bug. Share the error message and a minimal code snippet, and I'll propose a fix + why it happens.";
+//   if (lower.includes("schema") || lower.includes("model"))
+//     return "For mentor/mentee, prefer separate collections if they diverge in fields/queries; otherwise a single Users collection with a `role` and role-specific subdocs works. I can sketch both!";
+//   if (lower.includes("optimize") || lower.includes("performance"))
+//     return "Profile first. Measure slow paths, then cache, paginate, and ship fewer bytes. I can give you a step-by-step checklist.";
+//   return "Got it. I'll break this down, propose an approach, and provide code you can paste in.";
+// };
 
-const QuickChips = ({ onPick, hidden, onClose }) => {
-  if (hidden) return null;
-  const chips = [
-    "Debug my API route",
-    "Design mentor/mentee schema",
-    "Fix Mongo duplicate entries",
-    "Optimize React re-renders",
-  ];
-  return (
-    <div className="flex flex-wrap gap-2 mt-3">
-      {chips.map((c) => (
-        <button
-          key={c}
-          onClick={() => onPick(c)}
-          className="px-3 py-1 rounded-2xl text-sm transition-all"
-          style={{
-            background: COLORS.chipBg,
-            border: `1px solid ${COLORS.borderRed}40`,
-          }}
-        >
-          {c}
-        </button>
-      ))}
-      <button
-        onClick={onClose}
-        aria-label="Hide suggestions"
-        className="ml-auto px-2 py-1 rounded-full"
-        title="Hide suggestions"
-        style={{ border: `1px dashed ${COLORS.borderRed}40` }}
-      >
-        <X className="w-4 h-4" />
-      </button>
-    </div>
-  );
-};
+// const QuickChips = ({ onPick, hidden, onClose }) => {
+//   if (hidden) return null;
+//   const chips = [
+//     "Debug my API route",
+//     "Design mentor/mentee schema",
+//     "Fix Mongo duplicate entries",
+//     "Optimize React re-renders",
+//   ];
+//   return (
+//     <div className="flex flex-wrap gap-2 mt-3">
+//       {chips.map((c) => (
+//         <button
+//           key={c}
+//           onClick={() => onPick(c)}
+//           className="px-3 py-1 rounded-2xl text-sm transition-all"
+//           style={{
+//             background: COLORS.chipBg,
+//             border: `1px solid ${COLORS.borderRed}40`,
+//           }}
+//         >
+//           {c}
+//         </button>
+//       ))}
+//       <button
+//         onClick={onClose}
+//         aria-label="Hide suggestions"
+//         className="ml-auto px-2 py-1 rounded-full"
+//         title="Hide suggestions"
+//         style={{ border: `1px dashed ${COLORS.borderRed}40` }}
+//       >
+//         <X className="w-4 h-4" />
+//       </button>
+//     </div>
+//   );
+// };
 
-const Message = ({ role, text }) => {
-  const isUser = role === "user";
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`w-full flex ${isUser ? "justify-end" : "justify-start"}`}
-    >
-      <div className={`max-w-[85%] sm:max-w-[70%] flex gap-3 items-end`}>
-        {!isUser && (
-          <div
-            className="shrink-0 w-8 h-8 rounded-full grid place-items-center"
-            style={{
-              background: COLORS.bubbleAI,
-              border: `1px solid ${COLORS.borderRed}33`,
-            }}
-          >
-            <Bot className="w-4 h-4" />
-          </div>
-        )}
+// const Message = ({ role, text }) => {
+//   const isUser = role === "user";
+//   return (
+//     <motion.div
+//       initial={{ opacity: 0, y: 8 }}
+//       animate={{ opacity: 1, y: 0 }}
+//       className={`w-full flex ${isUser ? "justify-end" : "justify-start"}`}
+//     >
+//       <div className={`max-w-[85%] sm:max-w-[70%] flex gap-3 items-end`}>
+//         {!isUser && (
+//           <div
+//             className="shrink-0 w-8 h-8 rounded-full grid place-items-center"
+//             style={{
+//               background: COLORS.bubbleAI,
+//               border: `1px solid ${COLORS.borderRed}33`,
+//             }}
+//           >
+//             <Bot className="w-4 h-4" />
+//           </div>
+//         )}
 
-        <div
-          className="rounded-2xl px-4 py-2 shadow-lg"
-          style={{
-            background: isUser
-              ? `linear-gradient(135deg, ${COLORS.bubbleUser}, #cc1515)`
-              : COLORS.bubbleAI,
-            border: isUser ? "none" : `1px solid ${COLORS.borderRed}33`,
-          }}
-        >
-          <p className="leading-relaxed text-sm sm:text-base whitespace-pre-wrap">
-            {text}
-          </p>
-        </div>
+//         <div
+//           className="rounded-2xl px-4 py-2 shadow-lg"
+//           style={{
+//             background: isUser
+//               ? `linear-gradient(135deg, ${COLORS.bubbleUser}, #cc1515)`
+//               : COLORS.bubbleAI,
+//             border: isUser ? "none" : `1px solid ${COLORS.borderRed}33`,
+//           }}
+//         >
+//           <p className="leading-relaxed text-sm sm:text-base whitespace-pre-wrap">
+//             {text}
+//           </p>
+//         </div>
 
-        {isUser && (
-          <div
-            className="shrink-0 w-8 h-8 rounded-full grid place-items-center"
-            style={{ background: COLORS.bubbleUser }}
-          >
-            <UserIcon className="w-4 h-4" />
-          </div>
-        )}
-      </div>
-    </motion.div>
-  );
-};
+//         {isUser && (
+//           <div
+//             className="shrink-0 w-8 h-8 rounded-full grid place-items-center"
+//             style={{ background: COLORS.bubbleUser }}
+//           >
+//             <UserIcon className="w-4 h-4" />
+//           </div>
+//         )}
+//       </div>
+//     </motion.div>
+//   );
+// };
 
 export const LiveSession = () => {
+  const { User, sessions } = useContext(GlobalContext);
+
   return (
     <section>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-white">
-          Live & Upcoming Sessions
-        </h2>
+        <h2 className="text-2xl font-bold text-white">Upcoming Sessions</h2>
         <button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-red-500/30">
-          <Plus size={18} />
-          New Session
+          View All Sessions
         </button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          {
-            title: "JavaScript Fundamentals",
-            mentee: "Sarah Johnson",
-            time: "2:00 PM",
-            status: "live",
-            avatar:
-              "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100&h=100",
-          },
-          {
-            title: "React Best Practices",
-            mentee: "Mike Chen",
-            time: "4:00 PM",
-            status: "upcoming",
-            avatar:
-              "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100&h=100",
-          },
-          {
-            title: "Career Guidance",
-            mentee: "Emily Davis",
-            time: "6:00 PM",
-            status: "upcoming",
-            avatar:
-              "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=100&h=100",
-          },
-        ].map((session, i) => (
+        {sessions.slice(0, 3)?.map((session, i) => (
           <div
             key={i}
             className="group relative overflow-hidden bg-gradient-to-br from-gray-900/90 to-black/70 p-6 rounded-2xl border border-red-500/30 hover:border-red-400/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-red-500/25"
@@ -322,44 +330,57 @@ export const LiveSession = () => {
               <div className="flex items-center justify-between mb-4">
                 <div
                   className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    session.status === "live"
+                    session?.status === "live"
                       ? "bg-red-600/20 text-red-300 border border-red-500/30"
                       : "bg-yellow-600/20 text-yellow-300 border border-yellow-500/30"
                   }`}
                 >
-                  {session.status === "live" && (
+                  {session?.status === "live" && (
                     <div className="w-2 h-2 bg-red-400 rounded-full inline-block mr-2 animate-pulse"></div>
                   )}
-                  {session.status.toUpperCase()}
+                  {session?.status?.toUpperCase()}
                 </div>
                 <button className="text-gray-400 hover:text-white transition-colors">
                   <MoreVertical size={16} />
                 </button>
               </div>
               <h3 className="font-bold text-white text-lg mb-2">
-                {session.title}
+                {session?.title}
               </h3>
               <div className="flex items-center gap-3 mb-4">
-                <img
-                  src={session.avatar}
-                  alt={session.mentee}
-                  className="w-8 h-8 rounded-full border-2 border-red-500/30"
-                />
+                {session.mentee?.profile ? (
+                  <img
+                    src={session?.avatar}
+                    alt={session?.mentee?.profile}
+                    className="w-8 h-8 rounded-full border-2 border-red-500/30"
+                  />
+                ) : (
+                  <div
+                    className="w-10 h-10 flex justify-center items-center 
+                bg-gradient-to-br from-red-500 to-pink-600 
+                text-white text-xl font-bold 
+                rounded-full border-2 border-white/30 
+                shadow-lg hover:scale-110 transition-transform duration-300 
+                cursor-pointer"
+                  >
+                    {session.mentee.name?.charAt(0)}
+                  </div>
+                )}
                 <div>
                   <p className="text-red-200 font-medium text-sm">
-                    {session.mentee}
+                    {session?.mentee?.name}
                   </p>
-                  <p className="text-gray-400 text-xs">{session.time}</p>
+                  <p className="text-gray-400 text-xs">{session?.time}</p>
                 </div>
               </div>
               <button
                 className={`w-full py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105 ${
-                  session.status === "live"
+                  session?.status === "live"
                     ? "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white hover:shadow-lg hover:shadow-red-500/30"
                     : "bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white"
                 }`}
               >
-                {session.status === "live" ? (
+                {session?.status === "live" ? (
                   <div className="flex items-center justify-center gap-2">
                     <Video size={18} />
                     Join Session

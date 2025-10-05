@@ -27,6 +27,7 @@ import WishListSer from "../services/AddToWishList";
 import { Link, useNavigate } from "react-router-dom";
 import { CreateConvo } from "../services/Convo";
 import { socket } from "../utils/socket";
+import CreatePayment from "../services/Payment";
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
@@ -222,14 +223,75 @@ function BrowseMentor() {
 
   // create convo and navigate to chat
 
+  // before navigate to chat we should conform that user paid
+
+  async function Transaction(e, res) {
+    e.preventDefault();
+
+    try {
+      const data = {
+        amount: 500,
+        currency: "INR",
+        receipt: "lsd212",
+      };
+      const res = await CreatePayment(data);
+
+      console.log("resonse to pay ", res);
+
+      var options = {
+        key: "rzp_test_RPjlXkYi5KcmkQ", // Enter the Key ID generated from the Dashboard
+        amount: data.amount, // Amount is in currency subunits.
+        currency: data.currency,
+        name: "Acme Corp", //your business name
+        description: "Test Transaction",
+        image: "https://example.com/your_logo",
+        order_id: res.order.id || res.order._id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        handler: function (response) {
+          alert(response.razorpay_payment_id);
+          alert(response.razorpay_order_id);
+          alert(response.razorpay_signature);
+        },
+        prefill: {
+          //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+          name: "sanjit Kumar", //your customer's name
+          email: "gaurav.kumar@example.com",
+          contact: "+928848488382", //Provide the customer's phone number for better conversion rates
+        },
+        notes: {
+          address: "Razorpay Corporate Office",
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+      var rzp1 = new window.Razorpay(options);
+      rzp1.on("payment.failed", function (response) {
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+      });
+      rzp1.open();
+      if (res.status) {
+        navigate(`/chat/${res.generateConvo._id}`);
+      }
+    } catch (error) {
+      console.log("error to pay money", error);
+    }
+  }
+
   const user = JSON.parse(localStorage.getItem("user"));
-  async function NavigateToChat(mentorId) {
+  async function NavigateToChat(e, mentorId) {
     try {
       const res = await CreateConvo(mentorId, user.token);
       console.log("responsive while creating convo in navigatetochat");
-      navigate(`/chat/${res.generateConvo._id}`);
+      Transaction(e, res);
     } catch (error) {
       console.log("error in responsive while creating", error);
+
       navigate(`/chat/${error.response.data.existed._id}`);
     }
   }
@@ -443,7 +505,7 @@ function BrowseMentor() {
                         <div className="flex gap-2">
                           <button
                             className="p-2 rounded-xl border border-gray-600 hover:bg-red-600/20 hover:border-red-500 transition-all duration-300 group"
-                            onClick={() => NavigateToChat(mentor._id)}
+                            onClick={(e) => NavigateToChat(e, mentor._id)}
                           >
                             <MessageCircle className="w-5 h-5 text-gray-400 group-hover:text-red-400 transition-colors duration-300" />
                           </button>
