@@ -261,7 +261,7 @@ function BrowseMentor() {
           address: "Razorpay Corporate Office",
         },
         theme: {
-          color: "#3399cc",
+          color: "#E43737",
         },
       };
       var rzp1 = new window.Razorpay(options);

@@ -1,9 +1,11 @@
 import {
   CreateNotificationService,
   GetAUserNotificationById,
+  UpdateNotificationIsReadService,
 } from "../Services/Notification.js";
 
 import User from "../Model/UserSchema.js";
+import message from "../Model/Message.js";
 export const CreateNotice = async (req, res) => {
   try {
     const { receiver, message, type, isRead, title, convoId, sessionId } =
@@ -69,6 +71,29 @@ export const GetAUserNotification = async (req, res) => {
     console.group("error", error);
     return res.status(501).json({
       message: "Internal server error",
+    });
+  }
+};
+
+export const UpdateIsRead = async (req, res) => {
+  try {
+    const user = req.user.userId;
+
+    const response = await UpdateNotificationIsReadService(user);
+    if (!response) {
+      return res.status(403).json({
+        message: "Could not update ",
+      });
+    }
+    return res.status(201).json({
+      success: true,
+      message: "updated successfully",
+      response,
+    });
+  } catch (error) {
+    return res.status(501).json({
+      message: "Internal server error ",
+      success: false,
     });
   }
 };

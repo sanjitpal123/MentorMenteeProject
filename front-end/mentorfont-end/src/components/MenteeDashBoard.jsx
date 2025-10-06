@@ -184,11 +184,11 @@ export const Task = () => {
   useEffect(() => {
     FetchAllTask();
   }, []);
+
   async function DeleteExpireTask(taskid) {
     try {
       const res = await DeleteExpireOne(user.token, taskid);
       console.log("response to delete expire task", res);
-      FetchAllTask();
     } catch (error) {
       console.log("error to delete expire one", error);
     }

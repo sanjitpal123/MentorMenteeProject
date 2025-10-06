@@ -13,11 +13,13 @@ dotenv.config();
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    credentials: true, // ✅ lowercase
+    origin: [
+      "http://localhost:5173", // optional if still running dev
+      "http://localhost:8080", // frontend container port
+    ],
+    credentials: true,
   })
 );
-
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,8 +27,8 @@ app.use("/api/v1", MainRouter);
 
 const server = http.createServer(app);
 
-server.listen(process.env.PORT || 3000, () => {
-  console.log("Server is running at", process.env.PORT || 3000);
+server.listen(process.env.PORT || 5000, () => {
+  console.log("Server is running at", process.env.PORT || 5000);
   Connection();
 });
 

@@ -1,6 +1,7 @@
 import {
   CreateNotificationRepo,
   GetUserNotificationRepo,
+  UpdateNotificationIsRead,
 } from "../Repository/Notification.js";
 
 export const CreateNotificationService = async (data) => {
@@ -15,6 +16,15 @@ export const CreateNotificationService = async (data) => {
 export const GetAUserNotificationById = async (user) => {
   try {
     const res = await GetUserNotificationRepo(user);
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const UpdateNotificationIsReadService = async (userId) => {
+  try {
+    const res = await UpdateNotificationIsRead(userId);
     return res;
   } catch (error) {
     throw error;

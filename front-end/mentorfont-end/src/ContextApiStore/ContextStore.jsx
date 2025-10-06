@@ -9,6 +9,7 @@ export const GlobalContextProvider = ({ children }) => {
   const [mentorCount, setMentorCount] = useState(0);
   const [menteeCount, setMenteeCount] = useState(0);
   const [selectedMentees, setselectedMentees] = useState([]);
+  const [AllNotification, setAllNotification] = useState([]);
 
   const [filterMentors, setFilterMentors] = useState([]);
   const [pages, Setpages] = useState(1);
@@ -16,6 +17,7 @@ export const GlobalContextProvider = ({ children }) => {
   const [Suser, setSUser] = useState();
   const [Performance, setPerformance] = useState("");
   const [sessions, setsessions] = useState([]);
+  const [unSeenNotification, setCountUnseenNotification] = useState(0);
 
   // Load user from localStorage on first render
   useEffect(() => {
@@ -43,6 +45,16 @@ export const GlobalContextProvider = ({ children }) => {
   }, [User]);
 
   useEffect(() => {
+    AllNotification.map((notification) => {
+      if (notification.isRead !== true) {
+        setCountUnseenNotification((prev) => prev + 1);
+        console.log("isread", notification.isRead);
+      } else {
+        console.log("all seen");
+      }
+    });
+  }, [AllNotification]);
+  useEffect(() => {
     GetMenteeProfile();
   }, []);
 
@@ -57,8 +69,11 @@ export const GlobalContextProvider = ({ children }) => {
         filterMentors,
         Setpages,
         pages,
+        unSeenNotification,
         User,
         Performance,
+        AllNotification,
+        setAllNotification,
         setPerformance,
         setUser,
         GetMenteeProfile,

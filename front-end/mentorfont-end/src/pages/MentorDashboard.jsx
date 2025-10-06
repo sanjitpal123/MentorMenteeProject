@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   LiveSession,
   RecentActivities,
@@ -48,17 +48,23 @@ import {
 import { socket } from "../utils/socket";
 import Notification from "../components/Notification";
 import { toast } from "react-toastify";
+import { GlobalContext } from "../ContextApiStore/ContextStore";
+import { GetNotification, UpdateIsRead } from "../services/Notification";
 export default function MentorDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showCreateSession, setShowCreateSession] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
+  const { setAllNotification, User, unSeenNotification } =
+    useContext(GlobalContext);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     const handleNotification = () => {
       toast.dismiss();
       toast.info("New Session Has Been Created");
     };
+    GetAllNotification();
     const handleTaskAttendingNotification = () => {
       toast.dismiss();
       toast.success("Someone Has Attended Task");
@@ -589,6 +595,13 @@ export default function MentorDashboard() {
                 {item.id === "messages" && (
                   <div className="ml-auto w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
                     <span className="text-xs text-white font-bold">3</span>
+                  </div>
+                )}
+                {item.id === "notification" && unSeenNotification > 0 && (
+                  <div className="ml-auto w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                    <span className="text-xs text-white font-bold">
+                      {unSeenNotification}
+                    </span>
                   </div>
                 )}
               </button>

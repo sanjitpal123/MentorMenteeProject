@@ -13,7 +13,7 @@ FROM base AS production
 COPY  --from=builder /app /package*.json ./
 COPY --from=builder /app ./
 
-EXPOSE 4000
+EXPOSE 5000
 
 CMD [ "npm","start" ]
 

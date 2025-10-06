@@ -29,3 +29,22 @@ export const GetNotification = async (token) => {
     throw error;
   }
 };
+
+export const UpdateIsRead = async (token) => {
+  try {
+    console.log("token", token);
+
+    const res = await axiosInstance.put(
+      "/notification/update-isread",
+      {}, // empty body
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

@@ -20,3 +20,15 @@ export const GetUserNotificationRepo = async (userId) => {
     throw error;
   }
 };
+
+export const UpdateNotificationIsRead = async (userId) => {
+  try {
+    const res = await Notification.updateMany(
+      { receiver: userId },
+      { $set: { isRead: true } }
+    );
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
