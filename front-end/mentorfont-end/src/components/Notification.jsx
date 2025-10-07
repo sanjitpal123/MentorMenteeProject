@@ -23,30 +23,30 @@ function Notification() {
   } = useContext(GlobalContext);
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // async function GetAllNotification() {
-  //   try {
-  //     const res = await GetNotification(user.token);
-  //     setNotifications(res.notification || []);
-  //     setAllNotification(res.notification || []);
-  //     console.log("response to get notification", res);
-  //     UpdateAllIsRead();
-  //   } catch (error) {
-  //     console.log("error to get notification", error);
-  //   }
-  // }
+  async function GetAllNotification() {
+    try {
+      const res = await GetNotification(user.token);
+      setNotifications(res.notification || []);
+      setAllNotification(res.notification || []);
+      console.log("response to get notification", res);
+      UpdateAllIsRead();
+    } catch (error) {
+      console.log("error to get notification", error);
+    }
+  }
   async function UpdateAllIsRead() {
     try {
       const updated = await UpdateIsRead(user.token);
       console.log("udpated", updated);
-      setCountUnseenNotification(0);
     } catch (error) {
       console.log("error to update", error);
     }
   }
 
   useEffect(() => {
+    GetAllNotification();
     UpdateAllIsRead();
-  }, [AllNotification]);
+  }, []);
 
   async function handleAccept(note) {
     try {

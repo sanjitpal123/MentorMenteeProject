@@ -54,6 +54,7 @@ export const GlobalContextProvider = ({ children }) => {
       }
     });
   }, [AllNotification]);
+
   useEffect(() => {
     GetMenteeProfile();
   }, []);

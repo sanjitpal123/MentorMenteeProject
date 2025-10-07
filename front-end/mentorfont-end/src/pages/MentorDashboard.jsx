@@ -64,7 +64,6 @@ export default function MentorDashboard() {
       toast.dismiss();
       toast.info("New Session Has Been Created");
     };
-    GetAllNotification();
     const handleTaskAttendingNotification = () => {
       toast.dismiss();
       toast.success("Someone Has Attended Task");
