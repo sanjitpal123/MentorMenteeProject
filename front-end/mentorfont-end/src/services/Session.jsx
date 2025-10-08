@@ -72,3 +72,20 @@ export const SearchSessionByCategorySer = async (token, data) => {
     throw error;
   }
 };
+
+export const RescheduleSessionSer = async (token, data, sessionId) => {
+  try {
+    const res = await axiosInstance.put(
+      `/session/reschedule/${sessionId}`,
+      data,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

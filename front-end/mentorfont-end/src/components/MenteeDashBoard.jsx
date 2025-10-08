@@ -124,6 +124,7 @@ import { DeleteExpireOne, getTask } from "../services/Task";
 import { useNavigate } from "react-router-dom";
 import { GetAllMessageSer } from "../services/Message";
 import { GetAllSessionSer } from "../services/Session";
+import { CreateConvo } from "../services/Convo";
 function AdvancedTab() {
   return (
     <div className="mb-8 animate-slide-up animation-delay-200">
@@ -277,6 +278,7 @@ export const Task = () => {
 export const Sessions = () => {
   const [upcomingSessions, setupcomingSessions] = useState([]);
   const { User } = useContext(GlobalContext);
+  const Navigator = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
   async function GetAllSessions() {
     try {
@@ -287,9 +289,25 @@ export const Sessions = () => {
       console.log("error to get sessions", error);
     }
   }
+  async function handleNavigateToChat(mentorId) {
+    try {
+      const res = await CreateConvo(mentorId, user.token);
+      console.log("responsive while creating convo in navigatetochat");
+      Transaction(e, res);
+    } catch (error) {
+      console.log("error in responsive while creating", error);
+
+      Navigator(`/chat/${error.response.data.existed._id}`);
+    }
+  }
+
+  async function RescheduleSession(session) {
+    Navigator(`/createsession`, { state: session });
+  }
   useEffect(() => {
     GetAllSessions();
   }, []);
+
   return (
     <div className="space-y-8">
       {/* Sessions Header */}
@@ -364,7 +382,8 @@ export const Sessions = () => {
                       <span className="flex items-center gap-2 hover:text-white transition-colors duration-200">
                         <Calendar size={16} className="text-red-400" />
                         <span className="font-medium">
-                          {session?.date.toLocaleString([], {
+                          Due Date
+                          {new Date(session?.date).toLocaleString([], {
                             year: "2-digit",
                             month: "2-digit",
                             day: "2-digit",
@@ -377,7 +396,14 @@ export const Sessions = () => {
                       <span className="flex items-center gap-2 hover:text-white transition-colors duration-200">
                         <Clock size={16} className="text-red-400" />
                         <span className="font-medium">
-                          {session?.time} ({session?.duration})
+                          Created At
+                          {new Date(session.createdAt).toLocaleDateString([], {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </span>
                       </span>
                       <span className="flex items-center gap-2 hover:text-white transition-colors duration-200">
@@ -416,11 +442,17 @@ export const Sessions = () => {
                     <Video size={20} />
                     Join Session
                   </button>
-                  <button className="w-full bg-gray-800/60 hover:bg-gray-800/90 text-gray-300 hover:text-white py-4 rounded-xl border border-gray-700/60 hover:border-red-500/40 transition-all duration-300 flex items-center justify-center gap-2 font-semibold hover:scale-105 hover:-translate-y-1">
+                  <button
+                    onClick={() => RescheduleSession(session)}
+                    className="w-full bg-gray-800/60 hover:bg-gray-800/90 text-gray-300 hover:text-white py-4 rounded-xl border border-gray-700/60 hover:border-red-500/40 transition-all duration-300 flex items-center justify-center gap-2 font-semibold hover:scale-105 hover:-translate-y-1"
+                  >
                     <Calendar size={20} />
                     Reschedule
                   </button>
-                  <button className="w-full bg-gray-800/60 hover:bg-gray-800/90 text-gray-300 hover:text-white py-4 rounded-xl border border-gray-700/60 hover:border-red-500/40 transition-all duration-300 flex items-center justify-center gap-2 font-semibold hover:scale-105 hover:-translate-y-1">
+                  <button
+                    onClick={() => handleNavigateToChat(session.mentor._id)}
+                    className="w-full bg-gray-800/60 hover:bg-gray-800/90 text-gray-300 hover:text-white py-4 rounded-xl border border-gray-700/60 hover:border-red-500/40 transition-all duration-300 flex items-center justify-center gap-2 font-semibold hover:scale-105 hover:-translate-y-1"
+                  >
                     <MessageCircle size={20} />
                     Message Mentor
                   </button>

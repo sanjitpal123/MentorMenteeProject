@@ -2,9 +2,9 @@
 import { useContext, useEffect, useState } from "react";
 import { Calendar } from "lucide-react";
 import GetAllMentosService from "../services/GetAllmentors";
-import CreateSessionSer from "../services/Session";
+import CreateSessionSer, { RescheduleSessionSer } from "../services/Session";
 import { GlobalContext } from "../ContextApiStore/ContextStore";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { socket } from "../utils/socket";
 import { CreateNotificationSer } from "../services/Notification";
 
@@ -15,11 +15,13 @@ export default function ScheduleSession() {
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [Mentors, setMentors] = useState([]);
   const [sessionId, setSessionId] = useState(null);
+  const location = useLocation();
+  const session = location.state;
   const [FormData, setFormData] = useState({
     mentor: null,
-    date: "",
-    notes: "",
-    topic: "",
+    date: session?.date || "",
+    notes: session?.notes || "",
+    topic: session?.topic || "",
   });
 
   // create notification
@@ -50,6 +52,15 @@ export default function ScheduleSession() {
       console.log("error to get all mentors in schedule page", error);
     }
   }
+  async function handleReschedule() {
+    try {
+      const res = await RescheduleSessionSer(user.token, FormData, session._id);
+      console.log("response to reschedule", res);
+      Navigate("/mentee/dashboard");
+    } catch (error) {
+      console.log("error to reschedule", error);
+    }
+  }
 
   async function handleCreateSchedule() {
     try {
@@ -78,7 +89,7 @@ export default function ScheduleSession() {
         <div className="bg-gradient-to-br from-[#13080a] to-[#2b0e11] border border-red-900/30 rounded-2xl p-6 shadow-xl">
           <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
             <Calendar size={22} className="text-red-500" />
-            Schedule a Session
+            {`${session ? "Reschedule Session" : "Schedule a Session"}`}
           </h2>
 
           <div className="space-y-4">
@@ -231,12 +242,21 @@ export default function ScheduleSession() {
           </div>
 
           <div>
-            <button
-              className="w-full mt-10 bg-red-600 hover:bg-red-700 py-3 rounded-lg font-semibold"
-              onClick={handleCreateSchedule}
-            >
-              Schedule Session
-            </button>
+            {session ? (
+              <button
+                className="w-full mt-10 bg-red-600 hover:bg-red-700 py-3 rounded-lg font-semibold"
+                onClick={handleReschedule}
+              >
+                Reschedule Session
+              </button>
+            ) : (
+              <button
+                className="w-full mt-10 bg-red-600 hover:bg-red-700 py-3 rounded-lg font-semibold"
+                onClick={handleCreateSchedule}
+              >
+                Schedule Session
+              </button>
+            )}
           </div>
         </div>
       </div>
