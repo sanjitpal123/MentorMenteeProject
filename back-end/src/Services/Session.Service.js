@@ -26,9 +26,9 @@ export const GetASessionByid = async (id) => {
     throw error;
   }
 };
-export const RescheduleService = async (id, date) => {
+export const RescheduleService = async (id, data) => {
   try {
-    const updated = await RescheduleRepo(id, date);
+    const updated = await RescheduleRepo(id, data);
     return updated;
   } catch (error) {
     throw error;

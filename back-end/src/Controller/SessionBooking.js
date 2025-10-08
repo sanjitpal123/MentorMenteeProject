@@ -92,7 +92,14 @@ export const GetASession = async (req, res) => {
 
 export const Reschedule = async (req, res) => {
   try {
-    const { date, id } = req.body;
+    const { mentor, date, notes, topic } = req.body;
+    const id = req.params.id;
+    const data = {
+      mentor,
+      date,
+      notes,
+      topic,
+    };
     const exist = await GetASessionByid(id);
     if (!exist) {
       return res.status(404).json({
@@ -100,7 +107,7 @@ export const Reschedule = async (req, res) => {
         success: false,
       });
     }
-    const reschedule = await RescheduleService(exist._id, date);
+    const reschedule = await RescheduleService(exist._id, data);
     if (!reschedule) {
       return res.status(403).json({
         message: "can not reschedule",
@@ -114,7 +121,7 @@ export const Reschedule = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.log("error", error);
+    console.log("error to reschedule ", error);
     return res.status(501).json({
       message: "internal server error",
       successL: false,

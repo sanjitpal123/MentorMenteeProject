@@ -18,11 +18,11 @@ export const GetASessionByIdRepo = async (id) => {
   }
 };
 
-export const RescheduleRepo = async (id, date) => {
+export const RescheduleRepo = async (id, data) => {
   try {
     const updated = await Session.findByIdAndUpdate(
       id,
-      { date: date }, // wrap in object
+      { $set: data }, // wrap in object
       { new: true }
     );
     return updated;
