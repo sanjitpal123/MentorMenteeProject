@@ -15,7 +15,14 @@ export const GetMenteeByIdRepo = async (id) => {
   try {
     const user = await User.findById(id)
       .select("-password")
-      .populate("wishlist");
+      .populate("wishlist")
+      .populate({
+        path: "feedback",
+        populate: {
+          path: "mentor",
+          select: "-password ",
+        },
+      });
 
     console.log(JSON.stringify(user, null, 2));
     console.log("helloe mentors", user);

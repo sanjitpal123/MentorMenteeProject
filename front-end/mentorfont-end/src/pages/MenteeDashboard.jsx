@@ -123,7 +123,7 @@ import { Link } from "react-router-dom";
 import { socket } from "../utils/socket";
 import { GlobalContext } from "../ContextApiStore/ContextStore";
 import { toast } from "react-toastify";
-import { Sessions, Task } from "../components/MenteeDashBoard";
+import { Feedback, Sessions, Task } from "../components/MenteeDashBoard";
 const MenteeDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -808,7 +808,7 @@ const MenteeDashboard = () => {
                 { id: "learning", label: "Learning Paths", icon: BookOpen },
                 { id: "sessions", label: "Sessions", icon: Video },
                 { id: "analytics", label: "Analytics", icon: BarChart3 },
-                { id: "community", label: "Community", icon: Users },
+                { id: "feedback", label: "feedback", icon: Users },
                 { id: "task", label: "Task", icon: BookOpen },
               ].map((tab) => {
                 const IconComponent = tab.icon;
@@ -1510,117 +1510,7 @@ const MenteeDashboard = () => {
             </div>
           )}
 
-          {activeTab === "community" && (
-            <div className="space-y-8">
-              {/* Community Header */}
-              <div className="bg-gray-900/90 backdrop-blur-xl rounded-3xl p-8 border border-gray-800/60 shadow-2xl">
-                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-                  <div>
-                    <h2 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-white to-green-200 bg-clip-text text-transparent">
-                      Learning Community
-                    </h2>
-                    <p className="text-gray-400 text-lg">
-                      Connect with peers, share knowledge, and grow together
-                    </p>
-                  </div>
-                  <div className="flex gap-4">
-                    <button
-                      onClick={handleNetworkingHub}
-                      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-2xl hover:shadow-blue-500/30 hover:scale-105 hover:-translate-y-1"
-                    >
-                      <Users className="inline mr-2" size={20} />
-                      Networking Hub
-                    </button>
-                    <button
-                      onClick={handleCodeReviewAI}
-                      className="bg-gray-800/80 hover:bg-gray-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 border border-gray-700/60 hover:border-red-500 hover:scale-105 hover:-translate-y-1"
-                    >
-                      <Eye className="inline mr-2" size={20} />
-                      Code Review AI
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Mentor Feedback Enhanced */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {mentorFeedback.map((feedback, index) => (
-                  <div
-                    key={feedback.id}
-                    className="bg-gray-900/90 backdrop-blur-xl rounded-3xl p-8 border border-gray-800/60 hover:border-red-500/40 transition-all duration-500 shadow-2xl hover:shadow-purple-500/20 hover:scale-[1.02] hover:-translate-y-2 group"
-                    style={{ animationDelay: `${index * 200}ms` }}
-                  >
-                    <div className="flex items-start gap-4 mb-6">
-                      <img
-                        src={feedback.avatar}
-                        alt={feedback.mentor}
-                        className="w-18 h-18 rounded-2xl object-cover border-2 border-gray-600 hover:border-red-500 transition-colors duration-300 shadow-lg hover:scale-110"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-xl font-bold text-white group-hover:text-red-200 transition-colors duration-300">
-                            {feedback.mentor}
-                          </h4>
-                          <span className="text-sm text-gray-400 font-medium">
-                            {feedback.date}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-4 mb-3">
-                          <div className="flex items-center gap-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                size={18}
-                                className={`${
-                                  i < feedback.rating
-                                    ? "text-yellow-400 fill-current"
-                                    : "text-gray-600"
-                                } hover:scale-110 transition-transform duration-200`}
-                              />
-                            ))}
-                          </div>
-                          <span className="px-3 py-1 bg-blue-600/30 text-blue-400 text-xs rounded-lg border border-blue-500/40 font-bold">
-                            {feedback.category}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <p className="text-gray-300 mb-6 leading-relaxed font-medium">
-                      {feedback.feedback}
-                    </p>
-
-                    <div className="mb-6">
-                      <h5 className="text-sm font-bold text-white mb-3">
-                        Action Items:
-                      </h5>
-                      <div className="space-y-2">
-                        {feedback.actionItems.map((item, itemIndex) => (
-                          <div
-                            key={itemIndex}
-                            className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-200 transition-colors duration-200 p-2 rounded-lg hover:bg-gray-800/30"
-                          >
-                            <CheckCircle2 size={16} className="text-red-400" />
-                            <span className="font-medium">{item}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <button className="flex-1 bg-red-600/30 hover:bg-red-600/50 text-red-400 py-3 rounded-xl border border-red-500/40 transition-all duration-300 text-sm font-semibold hover:scale-105">
-                        <MessageCircle className="inline mr-2" size={16} />
-                        Reply
-                      </button>
-                      <button className="bg-gray-800/60 hover:bg-gray-800/90 text-gray-300 px-4 py-3 rounded-xl border border-gray-700/60 transition-all duration-300 hover:scale-105">
-                        <Bookmark size={16} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {activeTab === "feedback" && <Feedback />}
           {activeTab === "task" && <Task />}
         </div>
 
