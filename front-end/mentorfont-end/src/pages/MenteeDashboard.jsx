@@ -123,7 +123,12 @@ import { Link } from "react-router-dom";
 import { socket } from "../utils/socket";
 import { GlobalContext } from "../ContextApiStore/ContextStore";
 import { toast } from "react-toastify";
-import { Feedback, Sessions, Task } from "../components/MenteeDashBoard";
+import {
+  Feedback,
+  Notification,
+  Sessions,
+  Task,
+} from "../components/MenteeDashBoard";
 const MenteeDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -807,7 +812,7 @@ const MenteeDashboard = () => {
                 { id: "overview", label: "Overview", icon: Home },
                 { id: "learning", label: "Learning Paths", icon: BookOpen },
                 { id: "sessions", label: "Sessions", icon: Video },
-                { id: "analytics", label: "Analytics", icon: BarChart3 },
+                { id: "notification", label: "Notification", icon: Bell },
                 { id: "feedback", label: "feedback", icon: Users },
                 { id: "task", label: "Task", icon: BookOpen },
               ].map((tab) => {
@@ -1416,99 +1421,7 @@ const MenteeDashboard = () => {
 
           {activeTab === "sessions" && <Sessions />}
 
-          {activeTab === "analytics" && (
-            <div className="space-y-8">
-              {/* Analytics Header */}
-              <div className="bg-gray-900/90 backdrop-blur-xl rounded-3xl p-8 border border-gray-800/60 shadow-2xl">
-                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-                  <div>
-                    <h2 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-                      Learning Analytics
-                    </h2>
-                    <p className="text-gray-400 text-lg">
-                      Deep insights into your learning patterns and performance
-                    </p>
-                  </div>
-                  <div className="flex gap-4">
-                    <button
-                      onClick={handleProgressPrediction}
-                      className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-2xl hover:shadow-purple-500/30 hover:scale-105 hover:-translate-y-1"
-                    >
-                      <Brain className="inline mr-2" size={20} />
-                      Predict Progress
-                    </button>
-                    <button className="bg-gray-800/80 hover:bg-gray-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 border border-gray-700/60 hover:border-red-500 hover:scale-105 hover:-translate-y-1">
-                      <Download className="inline mr-2" size={20} />
-                      Export Report
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Analytics Grid */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                <div className="bg-gray-900/90 backdrop-blur-xl rounded-3xl p-8 border border-gray-800/60 hover:border-red-500/40 transition-all duration-500 shadow-2xl hover:shadow-blue-500/20 hover:scale-[1.02] hover:-translate-y-2">
-                  <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                    <BarChart3 className="text-red-500" size={28} />
-                    Weekly Performance
-                  </h3>
-                  <div className="h-80 bg-gray-800/30 rounded-2xl border border-gray-700/50 p-4">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={advancedProgressData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                        <XAxis dataKey="week" stroke="#9CA3AF" />
-                        <YAxis stroke="#9CA3AF" />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "#1F2937",
-                            border: "1px solid #EF4444",
-                            borderRadius: "12px",
-                            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-                          }}
-                        />
-                        <Bar
-                          dataKey="engagement"
-                          fill="#EF4444"
-                          radius={[4, 4, 0, 0]}
-                        />
-                        <Bar
-                          dataKey="focus"
-                          fill="#3B82F6"
-                          radius={[4, 4, 0, 0]}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-
-                <div className="bg-gray-900/90 backdrop-blur-xl rounded-3xl p-8 border border-gray-800/60 hover:border-red-500/40 transition-all duration-500 shadow-2xl hover:shadow-green-500/20 hover:scale-[1.02] hover:-translate-y-2">
-                  <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                    <PieChart className="text-red-500" size={28} />
-                    Skill Distribution
-                  </h3>
-                  <div className="h-80 bg-gray-800/30 rounded-2xl border border-gray-700/50 p-4">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RechartsPieChart>
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "#1F2937",
-                            border: "1px solid #EF4444",
-                            borderRadius: "12px",
-                            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-                          }}
-                        />
-                        <RechartsPieChart data={skillsData}>
-                          {skillsData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </RechartsPieChart>
-                      </RechartsPieChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          {activeTab === "notification" && <Notification />}
 
           {activeTab === "feedback" && <Feedback />}
           {activeTab === "task" && <Task />}

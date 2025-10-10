@@ -126,6 +126,8 @@ import { GetAllMessageSer } from "../services/Message";
 import { GetAllSessionSer } from "../services/Session";
 import { CreateConvo } from "../services/Convo";
 import GetMenteeprofileser from "../services/GetMenteeProfile";
+import FormatTime from "../utils/DateFormat";
+import { GetNotification } from "../services/Notification";
 function AdvancedTab() {
   return (
     <div className="mb-8 animate-slide-up animation-delay-200">
@@ -532,7 +534,7 @@ export const Feedback = () => {
                     {fb.mentor?.name || "Mentor Name"}
                   </h3>
                   <p className="text-gray-400 text-sm">
-                    {new Date(fb.createdAt).toLocaleDateString()}
+                    {FormatTime(fb.createdAt)}
                   </p>
                 </div>
               </div>
@@ -555,4 +557,21 @@ export const Feedback = () => {
       </div>
     </div>
   );
+};
+
+export const Notification = () => {
+  const { User } = useContext(GlobalContext);
+  const user = JSON.parse(localStorage.getItem("user"));
+  async function getNotification() {
+    try {
+      const res = await GetNotification(user.token);
+      console.log("response to get notification", res);
+    } catch (error) {
+      console.log("error to get notification");
+    }
+  }
+  useEffect(() => {
+    getNotification();
+  }, []);
+  return <div></div>;
 };

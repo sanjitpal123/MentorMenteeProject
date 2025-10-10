@@ -12,6 +12,7 @@ import { GetNotification, UpdateIsRead } from "../services/Notification";
 import { GlobalContext } from "../ContextApiStore/ContextStore";
 import { UpdateStatus } from "../services/Session";
 import { socket } from "../utils/socket";
+import FormatTime from "../utils/DateFormat";
 
 function Notification() {
   const [Notifications, setNotifications] = useState([]);
@@ -80,32 +81,6 @@ function Notification() {
     }
   };
 
-  const formatTime = (date) => {
-    const seconds = Math.floor((Date.now() - new Date(date)) / 1000);
-
-    const units = [
-      { label: "y", value: 31536000 }, // 365 days
-      { label: "mo", value: 2592000 }, // 30 days
-      { label: "d", value: 86400 },
-      { label: "h", value: 3600 },
-      { label: "m", value: 60 },
-      { label: "s", value: 1 },
-    ];
-
-    for (let unit of units) {
-      const quotient = Math.floor(seconds / unit.value);
-
-      // Special case: yesterday
-      if (unit.label === "d" && quotient === 1) {
-        return "yesterday";
-      }
-
-      if (quotient > 0) return `${quotient}${unit.label} ago`;
-    }
-
-    return "just now";
-  };
-
   const handleCancel = async (note) => {
     try {
       console.log("id to update", note);
@@ -154,7 +129,7 @@ function Notification() {
                 <p className="text-lg font-semibold">{note.title}</p>
                 <p className="text-sm text-gray-400 mt-1">{note.message}</p>
                 <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                  <Clock className="w-4 h-4" /> {formatTime(note.createdAt)}
+                  <Clock className="w-4 h-4" /> {FormatTime(note.createdAt)}
                   {note.type == "session" &&
                     note.sessionId.status == "pending" && (
                       <div className="flex gap-2 ml-10">
